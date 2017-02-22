@@ -2,7 +2,7 @@
 title: ALS推荐算法学习与实践
 toc: true
 categories: machine-learning
-tags: 推荐
+tags: 推荐算法、协同过滤、矩阵分解
 description: als算法原理及源码学习
 mathjax: true
 ---
