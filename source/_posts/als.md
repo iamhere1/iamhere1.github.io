@@ -1,9 +1,10 @@
 ---
 title: ALS推荐算法学习与实践
+date: 2017-02-22
 toc: true
-categories: machine-learning
-tags: 推荐算法、协同过滤、矩阵分解
-description: als算法原理及源码学习
+categories: recommand
+tags: [推荐算法,协同过滤,矩阵分解,隐语义模型]
+description: als算法学习与实践
 mathjax: true
 ---
 
@@ -22,13 +23,13 @@ mathjax: true
 </script>
 
 
-ALS（alternating least squares）是一种基础的推荐算法，相对于普通的协同过滤等方法，它不仅能通过降维增加模型的泛化能力，也方便加入其他建模因素（如时间、隐反馈及置信度等），大大提升了模型的灵活性。正因为此，ALS算法在Netflix推荐大赛中脱颖而出，在我们具体的工程实践中，也具有非常不错的表现。接下来，从如下几个方面和大家一起学习：ALS算法模型、spark ALS源码理解， ALS推荐实践。如描述有误，欢迎大家指正。
+ALS（alternating least squares）是一种基础的推荐算法，相对于普通的协同过滤等方法，它不仅能通过降维增加模型的泛化能力，也方便加入其他建模因素（如数据偏差、时间、隐反馈等），大大提升了模型的灵活性。正因为此，ALS算法在Netflix推荐大赛中脱颖而出，在我们具体的工程实践中，也具有非常不错的表现。接下来，从如下几个方面和大家一起学习：ALS算法模型、spark ALS源码理解， ALS推荐实践。如描述有误，欢迎大家指正。
 
 # ALS算法模型
 ## 为什么要用ALS模型
  相对于其他模型，ALS模型优势如下：
  
-* **相对于基于内容的推荐**，ALS属于协同过滤大家族【1】（也有人认为ALS 基于矩阵分解技术，不属于协同过滤范畴【2】），**直接跟进用户行为信息进行建模，不需要获取user和item的内容信息**（很多情况下这些内容信息并不是很好获取，但是相对基于内容的推荐，ALS存在冷启动问题）
+* **相对于基于内容的推荐**，ALS属于协同过滤大家族【1】【12】（也有人认为ALS 基于矩阵分解技术，不属于协同过滤范畴【2】），**直接跟进用户行为信息进行建模，不需要获取user和item的内容信息**（很多情况下这些内容信息并不是很好获取，但是相对基于内容的推荐，ALS存在冷启动问题）
 
 * **相对于传统的协同过滤推荐方法（user based、item based）**， ALS算法属于factor model, 通过将数据从原始空间映射到更低维度空间，**去除噪声信息，利用更主要的语义信息对问题建模，能获得更好的推荐效果**。
 
@@ -40,6 +41,47 @@ p\_u^Tq\_i)^2 + \lambda(p\_u^Tp\_u+q\_i^Tq\_i)$ （1）
 </center>
 
 * 针对所建模型1可以用SGD或ALS 两种算法求解。其中**sgd方法相对比较简单，但是当我们要建模的矩阵中已知元素较多时（如隐反馈），采用sgd在每次迭代都要求解所有元素，其时间复杂度是非常大的**。ALS算法在求解某个user （或item）向量时，不依赖其他任何user（item）向量，这个性质使得**ALS算法在每次迭代过程中方便并行化求解，在解决大规模矩阵分解问题时非常具有优势**。 
+
+## ALS模型有什么缺点
+ 相对于其它推荐算法，ALS模型具有非常明显的优势：不需要对user和item信息进行建模，能够更加灵活地对各种因素建模，方便大规模并行计算。但ALS模型在如下几方面，又有自己的局限性：
+ 
+ * 冷启动问题
+   
+   包括user的冷启动和item的冷启动。由于rating矩阵的构建，依赖user的显式和隐式反馈信息，对于新的user和item，或者没有相关行为的user或item, 导致无法构建rating矩阵，或者rating矩阵构建不合理。
+   
+   基于内容的推荐能较好地解决冷启动相关问题。如【8】在解决用户的冷启动问题时，首先根据用户之间社交的亲密度，对用户进行聚类，利用相同群体的用户画像来建模自身兴趣。同时，对于item的冷启动问题，可利用item本身对一些关键词、类目、内容等相关信息进行建模。【9】为了提高用户兴趣的准确率和覆盖率，在对用户兴趣建模对时候，将用户兴趣进行更具体的分类（如消费兴趣、生产兴趣、具体的每个行为兴趣等），并针对具体的业务，采用线性回归的方法对各种兴趣利用线性回归的方式进行加权求和，提升用户兴趣准确率和覆盖率。
+ 
+ * 用户临时兴趣
+ 
+   用户的兴趣是在不断变换的。对于相对较稳定的兴趣，ALS算法可以通过引入时间因素进行建模，如公式4。 但对于临时的兴趣变换，ALS算法是无法捕获的。
+   
+   **一种简单且有效的方法**
+   
+   将item划分为多个类别，每个类别对应一种兴趣。用户每次点击某个类别的item之后，认为该用户存在一种临时兴趣，通过动态增加相应类别的比例的item，迎合用户当前的消费需求。该方法的难点在于如何调整比例，才能让用户感到有很多自己喜欢的item, 同时又不会让用户感觉内容的单调。
+   
+   **淘宝的一些实践**
+   
+   为了有效获取用户的即时兴趣，给用户推荐最合适的产品，淘宝进行了比较多的实践【10】，分别如下所述。
+   * GBDT+FTRL模型
+   
+     由于GBDT模型比较擅长挖具有区分度的特征，其使用GBDT模型进行特征挖掘，将得到的特征输送给FTRL进行在线学习。输送给GBDT的特征包括两部分：一部分用户基础行为的次数、CTR等；另一部分是来自match粗选阶段的的特征，该部分特征来自不同的粗选模型输出.
+   
+   * Wide & Deep Learning模型
+   
+     借鉴google论文思想【11】，利用wide模型 + deep模型 + LR，其中wide子结构通过特征交叉学习特征间的共现，deep子结构则输入具有泛化能力的离散特征和连续特征，wide模型和deep模型学习到的结果，再利用LR模型预测相应的得分。
+     
+   * Adaptive-Online-Learning
+   
+     保留每一时刻学习到的模型，根据业务指标，得到每个模型等权重信息，融合出最优的结果。该方法能够比较好地综合利用用户长期喝短期兴趣。
+     
+   * Reinforcement Learning
+     
+     该方法思想是通过定义每个步骤的奖励，当用户每次到来的时候，根据用户的累积奖励值，进行个性化推荐。
+     
+   **腾讯的LSTM实践**
+     
+     为解决音乐的推荐问题，腾讯采用的是LSTM深度学习方法【12】，将用户听的歌曲序列，抽取特征输入到LSTM网络进行训练。为防止有些用户对应的歌曲序列较短问题，其对这些数据的训练采用特殊处理，相关数据缺失的序列不进行状态更新。同时，为加快训练速度，将每次权值的训练过程通过矩阵的方式实现并发计算。另外，为降低soft max过程时间复杂度，采用Hierarchical softmax过程替代普通的softmax。
+
   
 ## ALS模型是什么
 ### 基本概念
@@ -819,19 +861,88 @@ val sortedSrcFactors = new Array[FactorBlock](numSrcBlocks)
 
 ```
 
+# ALS推荐实践
 
+我们的平台是图片社交，每个用户都可以在平台上浏览图片，并进行点赞、评论等。推荐算法主要用于给用户推荐其最可能感兴趣的图片，最终提升用户体验。
+
+## 离线实验
+
+我们平台暂时无法得到用户的显式评分数据，但是可以得到用户点击、点赞、评论等相关行为信息。因此，比较适合用隐反馈矩阵分解模型。
+
+### 构造数据集
+* 数据预处理
+  
+  从2周的用户行为数据中，过滤无行为用户数据，spam图片数据和spam用户数据。
+
+* 构建rating元素
+
+  对预处理之后的数据，根据用户每天的图片交互行为，分别对点击、点赞和评论等分别赋予不同的权值，得到rating矩阵. 
+
+* 生成训练集和测试集
+
+  对于得到的rating数据，随机划分为两部分 $A:B = 7:3$，如果分别直接作为训练集和测试集是有问题的，因为$B$中的user或者item是有可能在$A$中没有出现过，这样会影响评估结果。 我们采用的方法是如果B数据中某个rating元素的user或item没有在A出现，则将该元素放到$A$中用作训练集。最终$A$和新加进来的元素共同构成训练集$A^1$， $B$留下的数据 $B^1$ 作为测试集。
+  
+
+### 离线训练和评估
+
+* 离线训练
+
+利用spark mllib库，对训练集构成的rating矩阵，建立隐反馈矩阵分解模型，并完成进行矩阵分解，生成user factor和item factor。
+
+* 评估
+
+调用模型的recommendForAll函数，对测试集所有user进行item推荐，并计算召回率和准确率。根据召回率和准确率，进行参数优化。
+
+* 评估指标
+
+假定$P_i$为用户$i$的预测结果，$P$为所有的预测结果，每个结果记录格式为（user, item）， $T$为测试集,每条记录格式为（user， item）。各种指标的的计算如下：
+
+召回率: $R= \frac{|P \bigcap T|}  {|T|}$
+
+准确率: $P= \frac{|P \bigcap T|}  {|P|}$
+
+F1:  $F= \frac{2PR}  {P+R} $
+
+离散度：$\frac{1}{N^2}\sum\_i\sum\_j\frac{|P\_i \bigcap P\_j|}{|P\_i \bigcup P\_j|}$
+
+除了上述指标之外，我们还对用户连续多天推荐结果的差异性、用户覆盖率、图片覆盖率等指标进行评估。
+
+## 在线ab测试
+
+abtest方案： 将als算法计算出的结果，定期写入到线上，作为线上的一种推荐来源。对实验组用户同时采用新策略和旧策略进行推荐，对照组用户只采用旧策略进行推荐。
+
+从2个维度进行评估：
+
+* 评估实验组和对照组用户在abtest上线前后点击率
+* 评估实验组用户在新旧两种策略推荐图片的点击率
+
+测试一定时间后，交换对照组和实验组用户，按照上述2个维度重新进行评估
+
+
+
+
+
+# 参考文献
 
 【1】Y Koren，R Bell，C Volinsky, "Matrix Factorization Techniques for Recommender Systems", 《Computer》, 2009.08; 42(8):30-37 
 
 【2】洪亮劼, "知人知面需知心——人工智能技术在推荐系统中的应用", 2016.11, http://mp.weixin.qq.com/s/JuaM8d52-f8AzTjEPnCl7g
 
-【3】S. Funk, “Netflix Update: Try This at Home”, 2006.12, http://sifter.org/~simon/journal/20061211.html
+【3】S. Funk, "Netflix Update: Try This at Home", 2006.12, http://sifter.org/~simon/journal/20061211.html
 
-【4】Y. Koren, “Factorization Meets the Neighborhood: A Mul-tifaceted Collaborative Filtering Model”, Proc. 14th ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, ACM Press, 2008, pp.426-434
+【4】Y. Koren, "Factorization Meets the Neighborhood: A Mul-tifaceted Collaborative Filtering Model", Proc. 14th ACM SIGKDD Int’l Conf. Knowledge Discovery and Data Mining, ACM Press, 2008, pp.426-434
 
-【5】A. Paterek, “Improving Regularized Singular Value De-composition for Collaborative Filtering” Proc. KDD Cup and Workshop, ACM Press, 2007, pp.39-42
+【5】A. Paterek, "Improving Regularized Singular Value De-composition for Collaborative Filtering" Proc. KDD Cup and Workshop, ACM Press, 2007, pp.39-42
 
-【6】G. Takács et al., “Major Components of the Gravity Recom- mendation System”, SIGKDD Explorations, vol. 9, 2007, pp.80-84
+【6】G. Takács et al., "Major Components of the Gravity Recom- mendation System", SIGKDD Explorations, 2007.09, vol.9, pp.80-84
 
 【7】孟祥瑞, "ALS 在 Spark MLlib 中的实现", 2015.05, http://www.csdn.net/article/2015-05-07/2824641
 
+【8】Zhen-ming Yuan, et al., "A microblog recommendation algorithm based on social tagging and a temporal interest evolution model", Frontiers of Information Technology & Electronic Engineering, 2015.07,
+Volume 16, Issue 7, pp 532–540 
+
+【9】Z Zhao, Z Cheng, L Hong, EH Chi, "Improving User Topic Interest Profiles by Behavior Factorization", Proceedings of the 24th International Conference on World Wide Web, 2015.05, pp.1406-1416【10】阿里技术，"淘宝搜索/推荐系统背后深度强化学习与自适应在线学习的实践之路", 2017.02, http://url.cn/451740J
+
+【11】HT Cheng, L Koc, J Harmsen, T Shaked, "Wide & Deep Learning for Recommender Systems", Proceedings of the 1st Workshop on Deep Learning for Recommender Systems, 2016.09,  pp.7-10
+
+【12】黄安埠, "递归的艺术 - 深度递归网络在序列式推荐的应用", 2016.10, http://mp.weixin.qq.com/s?__biz=MzA3MDQ4MzQzMg==&mid=2665690422&idx=1&sn=9bd671983a85286149b51c908b686899&chksm=842bb9b1b35c30a7eedb8d03e173aa8f43465db90e11075ac0c73b1784582f21eb93dcbd3e65&scene=0%23wechat_redirect
