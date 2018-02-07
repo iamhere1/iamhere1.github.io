@@ -2,7 +2,7 @@
 title: ALS推荐算法学习与实践
 date: 2017-02-22
 toc: true
-categories: recommand
+categories: 推荐系统
 tags: [推荐算法,协同过滤,矩阵分解,隐语义模型]
 description: als算法学习与实践
 mathjax: true

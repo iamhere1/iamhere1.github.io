@@ -1,0 +1,74 @@
+---
+title: 矩阵分解模型的分布式求解
+date: 2018-01-03
+toc: true
+categories: 推荐系统
+tags: [矩阵分解,隐语义模型,推荐算法,协同过滤]
+description: 矩阵分解模型分布式求解
+mathjax: true
+---
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+矩阵分解(mf)模型在推荐系统中有非常不错的表现，相对于传统的协同过滤方法，它不仅能通过降维增加模型的泛化能力，也方便加入其他因素（如数据偏差、时间、隐反馈等）对问题建模，从而产生更佳的推荐结果。本文主要介绍mf一些概念，基于sgd的mf分布式求解，基于als的mf分布式求解。
+该文涉及的所有分布式求解都是基于openmit[1]的ps框架，因此分布式求解都是在ps基础上进行实现的。相对于spark mllib的mf实现，在同样的资源情况下，该框架能支持更大规模的矩阵分解。
+
+# 矩阵分解相关概念
+我们接触到很多的矩阵分解相关的一些概念，svd,pca,mf推荐模型,als等，如下是对这些概念的一些解释。
+
+* **svd分解**
+svd分解,是将一个矩阵A分解为三个矩阵：
+$A\_{m,n}=U\_{m,m} I\_{m,n} V\_{n,n}^T  (1)$
+, 其中矩阵$I$对角线元素为奇异值，对应$AA^T$的特征值的平方根。 为了减少存储空间，可以用前$k$大的奇异值来近似描述矩阵$I$,$U$和$V^T$用对应前k大的左奇异向量和右奇异向量来近似：
+$A\_{m,n}=U\_{m,k} I\_{k,k} V\_{k,n}^T  (2)$
+* **pca**
+主成分分析，对原始数据进行降维使用。pca可以通过svd分解来实现，具体实现，可以对公式(2)两边同时乘$V\_{n,k}$,如下所示：
+$A\_{m,n} V\_{n,k} =U\_{m,k} I\_{k,k} V\_{k,n}^T V\_{n,k}
+=> A\_{m,n} V\_{n,k} =U\_{m,k} I\_{k,k}
+=> A\_{m,n} V\_{n,k} = A'\_{m,k}(3)$
+经过公式3, 矩阵A由n列降为k列。
+* **mf推荐模型**
+在推荐领域，一般不直接使用svd进行矩阵分解，因为svd要求所有的矩阵元素不能缺失，而推荐所使用的的rating矩阵很难是完整的（互联网上的item经常海量的，一个user很难有机会接触所有的item, 导致对应的user-item矩阵的对应的元素缺失)。如果使用svd分解进行推荐，首先就需要对缺失的矩阵元素进行填充，不仅耗费大量的精力，而且填充的效果并不能保证准确。
+因此，对于个性化推荐，一般直接对已知的元素建立矩阵分解模型，
+$MIN\_{PQ} \sum\_{u,i\in\mathbb K} {(r\_{ui} - 
+p\_u^Tq\_i）}^2 + \lambda(p\_u^Tp\_u+q\_i^Tq\_i)（4）$
+对于(4)这样的建模，有些paper[2]也叫svd对已知元素建模（The goal of SVD, when restricted to the known ratings）
+* **als**
+als（交替最小二乘）是一种矩阵分解优化算法。交替求解user向量和item向量，在求解user向量的时候固定item向量，在求解item向量的时候固定user向量，直到算法收敛或达到终止条件。
+als算法可用于求解矩阵分解模型模型如公式4, 也可用于更加灵活的矩阵分解模型，如隐反馈矩阵分解模型[3],更加灵活地用于个性化推荐。
+* **非负矩阵分解**
+非负矩阵分解，是指将非负的大矩阵分解成两个非负的小矩阵。其目标函数和约束如下：
+$MIN\_{PQ} \sum\_{u,i\in\mathbb K} {(r\_{ui} - 
+p\_u^Tq\_i）}^2 （5）$
+$subject \; to \; r\_{ui}>=0, \;p\_{uk}>=0,\; q\_{ik}>=0 $
+相对于其他矩阵分解，非负矩阵分解的输入元素为非负，分解后矩阵的元素也非负。从计算上讲，虽然分解元素为负值是正确的，但是在很多情况下，在实际问题中是没有意义的。非负矩阵广泛应用于图像分析、文本聚类、语音处理、推荐系统等。
+
+# sgd求解on openmit
+
+
+
+# als求解on openmit
+
+
+# 参考资料
+
+[1]https://github.com/openmit/openmit
+[2]Scalable Collaborative Filtering with Jointly Derived Neighborhood Interpolation Weights
+[3]Collaborative Filtering for Implicit Feedback Datasets 
+[4]Projected Gradient Methods for Nonnegative Matrix Factorization
+
+
+ 
