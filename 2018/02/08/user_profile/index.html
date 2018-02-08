@@ -92,10 +92,12 @@
 <meta property="og:site_name" content="个人学习博客">
 <meta property="og:description" content="用户画像学习与实践">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-02-08T08:26:43.000Z">
+<meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/function_of_user_profile.png">
+<meta property="og:updated_time" content="2018-02-08T15:04:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用户画像学习与实践">
 <meta name="twitter:description" content="用户画像学习与实践">
+<meta name="twitter:image" content="http://learning.github.com/2018/02/08/user_profile/function_of_user_profile.png">
 
 
 
@@ -335,10 +337,27 @@
 <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
 </script>
 
-<h1 id="用户画像是什么"><a href="#用户画像是什么" class="headerlink" title="用户画像是什么"></a>用户画像是什么</h1><p>   用户画像是根据用户的社会属性及各类行为，抽象出一个标签化的用户模型。其核心工作主要包括两点：</p>
-<p><strong>构建标签集:</strong> 根据实际业务需求、平台、数据等，确定构建用户画像的标签集合。</p>
-<p><strong>为用户贴上标签:</strong> 根据用户的社会属性和各类行为数据，利用机器学习模型及相关规则，为用户贴上标签集合中的标签。</p>
-<h1 id="用户画像的作用"><a href="#用户画像的作用" class="headerlink" title="用户画像的作用"></a>用户画像的作用</h1><h1 id="用户画像建模实践"><a href="#用户画像建模实践" class="headerlink" title="用户画像建模实践"></a>用户画像建模实践</h1>
+<h1 id="用户画像是什么"><a href="#用户画像是什么" class="headerlink" title="用户画像是什么"></a>用户画像是什么</h1><p>用户画像是根据用户的社会属性及各类行为，抽象出一个标签化的用户模型。其核心工作主要包括两点：</p>
+<p><strong>构建标签集:</strong> 根据实际业务需求、平台、数据等，确定用户画像的标签集合。如针对不同需求，可能需要用户兴趣画像、年龄性别画像、人群画像、地址画像、生命周期画像等，每类用户画像都可以确定对应的标签集合。</p>
+<p><strong>为用户贴上标签:</strong> 根据用户的社会属性和各类行为数据，利用机器学习模型或者相关规则，为用户贴上对应的标签。</p>
+<h1 id="用户画像的作用"><a href="#用户画像的作用" class="headerlink" title="用户画像的作用"></a>用户画像的作用</h1><p>通过构建用户画像，可以帮助我们更好地了解用户和产品，在个性化推荐和排序、用户精细化运营、产品分析，及辅助决策等方面，发挥很大的作用。如图1所示。</p>
+<p><img src="/2018/02/08/user_profile/function_of_user_profile.png" alt="“为什么需要用户画像”"></p>
+<center>图1 &ensp;用户画像的作用</center>
+
+
+<ul>
+<li><p><strong>个性化推荐和排序</strong><br><strong>个性化推荐：</strong>通过构建用户兴趣画像，可直接用于基于内容的推荐算法中，在一定程度上解决推荐过程中的冷启动问题；另外，用户画像可用于候选召回模块，在推荐排序阶段可作为有效的特征进行使用。<br><strong>搜索排序：</strong>通过加入用户画像特征，能够产生更加个性化的搜索效果，提升用户体验。</p>
+</li>
+<li><p><strong>用户精细化运营</strong><br>通过用户画像，使得在用户运营时，只选择相关的用户进行运营，提升运营的效率，节省运营成本。如通过用户流失预测模型，得到预流失用户，可以只针对这部分用户采取挽回措施；在进行相关运营推送活动中，只针对目标用户进行推送,可以减少不必要的资源浪费和用户干扰。</p>
+</li>
+<li><p><strong>产品分析报告</strong><br>通过构建用户画像，有助于对产品分析，如产品人群分布，产品趋势预测等，产出相关的产品分析报告。</p>
+</li>
+<li><p><strong>决策支持</strong><br>通过构建用户画像，能够更加了解平台用户相关信息，有助于产品决策。</p>
+</li>
+<li><p><strong>其它</strong><br>另外，用户画像还可用于定向广告投放，垂直行业分析等。</p>
+</li>
+</ul>
+<h1 id="用户画像建模实践"><a href="#用户画像建模实践" class="headerlink" title="用户画像建模实践"></a>用户画像建模实践</h1>
       
     </div>
 
@@ -450,7 +469,7 @@
           
             <div class="site-state-item site-state-categories">
               <a href="/categories">
-                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-count">4</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
