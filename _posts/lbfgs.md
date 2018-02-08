@@ -2,7 +2,7 @@
 title: lbfgs算法与源码学习
 date: 2018-1-13
 toc: true
-categories: 机器学习
+categories: 模型与算法
 tags: [lbfgs, 拟牛顿算法, 非线性优化]
 description: lbfgs算法具备牛顿法收敛速度快的优点，同时又不需要存储和计算完整的hessian矩阵，能够节省大量的存储和计算资源，非常适用于解决无约束的大规模的非线性优化问题。
 

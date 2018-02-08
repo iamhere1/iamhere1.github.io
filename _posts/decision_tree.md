@@ -2,7 +2,7 @@
 title: spark mllib 决策树算法源码学习
 date: 2016-12-07
 toc: true
-categories: 机器学习
+categories: 模型与算法
 tags: [决策树,spark mlilib源码]
 description:  决策树算法源码学习，其中模型的训练部分以随机森林的训练过程进行说明，决策树相当于树的数量为1的随机森林
 mathjax: true

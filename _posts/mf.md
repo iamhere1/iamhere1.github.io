@@ -2,7 +2,7 @@
 title: 矩阵分解模型的分布式求解
 date: 2018-01-03
 toc: true
-categories: 推荐系统
+categories: 模型与算法
 tags: [矩阵分解,隐语义模型,推荐算法,协同过滤]
 description: 矩阵分解模型分布式求解
 mathjax: true

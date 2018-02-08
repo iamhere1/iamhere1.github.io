@@ -2,7 +2,7 @@
 title: 神经网络与深度学习笔记
 date: 2017-04-18
 toc: true
-categories: 深度学习
+categories: 模型与算法
 tags: [深度学习,神经网络,学习总结]
 description: 深度学习、神经网络学习
 mathjax: true
