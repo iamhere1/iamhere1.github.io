@@ -84,19 +84,20 @@
 
 
 
-<meta name="description" content="用户画像学习与实践">
+<meta name="description" content="用户画像学习与总结">
 <meta name="keywords" content="用户画像">
 <meta property="og:type" content="article">
-<meta property="og:title" content="用户画像学习与实践">
+<meta property="og:title" content="用户画像学习与总结">
 <meta property="og:url" content="http://learning.github.com/2018/02/08/user_profile/index.html">
 <meta property="og:site_name" content="个人学习博客">
-<meta property="og:description" content="用户画像学习与实践">
+<meta property="og:description" content="用户画像学习与总结">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/function_of_user_profile.png">
-<meta property="og:updated_time" content="2018-02-08T15:04:01.000Z">
+<meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/user_interest_profile.png">
+<meta property="og:updated_time" content="2018-02-10T08:26:18.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="用户画像学习与实践">
-<meta name="twitter:description" content="用户画像学习与实践">
+<meta name="twitter:title" content="用户画像学习与总结">
+<meta name="twitter:description" content="用户画像学习与总结">
 <meta name="twitter:image" content="http://learning.github.com/2018/02/08/user_profile/function_of_user_profile.png">
 
 
@@ -115,7 +116,7 @@
   };
 </script>
 
-  <title> 用户画像学习与实践 | 个人学习博客 </title>
+  <title> 用户画像学习与总结 | 个人学习博客 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -255,7 +256,7 @@
             
             
               
-                用户画像学习与实践
+                用户画像学习与总结
               
             
           </h1>
@@ -301,7 +302,7 @@
 
           
           
-             <span id="/2018/02/08/user_profile/" class="leancloud_visitors" data-flag-title="用户画像学习与实践">
+             <span id="/2018/02/08/user_profile/" class="leancloud_visitors" data-flag-title="用户画像学习与总结">
                &nbsp; | &nbsp;
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -325,21 +326,21 @@
       
         <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    extensions: ["tex2jax.js"],
-    jax: ["input/TeX"],
-    tex2jax: {
-      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
-      displayMath: [ ['$$','$$']],
-      processEscapes: true
+    extensions： ["tex2jax.js"],
+    jax： ["input/TeX"],
+    tex2jax： {
+      inlineMath： [ ['$','$'], ['\\(','\\)'] ],
+      displayMath： [ ['$$','$$']],
+      processEscapes： true
     }
   });
 </script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+<script type="text/javascript" src="https：//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http：//myserver.com/MathJax/config/local/local.js">
 </script>
 
 <h1 id="用户画像是什么"><a href="#用户画像是什么" class="headerlink" title="用户画像是什么"></a>用户画像是什么</h1><p>用户画像是根据用户的社会属性及各类行为，抽象出一个标签化的用户模型。其核心工作主要包括两点：</p>
-<p><strong>构建标签集:</strong> 根据实际业务需求、平台、数据等，确定用户画像的标签集合。如针对不同需求，可能需要用户兴趣画像、年龄性别画像、人群画像、地址画像、生命周期画像等，每类用户画像都可以确定对应的标签集合。</p>
-<p><strong>为用户贴上标签:</strong> 根据用户的社会属性和各类行为数据，利用机器学习模型或者相关规则，为用户贴上对应的标签。</p>
+<p><strong>构建标签集：</strong> 根据实际业务需求、平台、数据等，确定用户画像的标签集合。如针对不同需求，可能需要用户兴趣画像、年龄性别画像、人群画像、地址画像、生命周期画像等，每类用户画像都可以确定对应的标签集合。</p>
+<p><strong>为用户贴上标签：</strong> 根据用户的社会属性和各类行为数据，利用机器学习模型或者相关规则，为用户贴上对应的标签。</p>
 <h1 id="用户画像的作用"><a href="#用户画像的作用" class="headerlink" title="用户画像的作用"></a>用户画像的作用</h1><p>通过构建用户画像，可以帮助我们更好地了解用户和产品，在个性化推荐和排序、用户精细化运营、产品分析，及辅助决策等方面，发挥很大的作用。如图1所示。</p>
 <p><img src="/2018/02/08/user_profile/function_of_user_profile.png" alt="“为什么需要用户画像”"></p>
 <center>图1 &ensp;用户画像的作用</center>
@@ -357,7 +358,43 @@
 <li><p><strong>其它</strong><br>另外，用户画像还可用于定向广告投放，垂直行业分析等。</p>
 </li>
 </ul>
-<h1 id="用户画像建模实践"><a href="#用户画像建模实践" class="headerlink" title="用户画像建模实践"></a>用户画像建模实践</h1>
+<h1 id="用户画像建模"><a href="#用户画像建模" class="headerlink" title="用户画像建模"></a>用户画像建模</h1><p>在用户画像建模时，要建立哪些维度用户画像，往往和实际的业务需求相关。如为了在推荐中解决item冷启动问题，需要建立用户内容兴趣画像、内容风格画像；为了个性化运营，需要建立人群画像、地域画像、年龄性别画像等；为挽回可能流失用户，需要建立用户生命周期画像等。</p>
+<h2 id="兴趣画像"><a href="#兴趣画像" class="headerlink" title="兴趣画像"></a>兴趣画像</h2><p>不同的时间段，用户兴趣会有变化，针对该特点，在建立用户画像时，可以考虑建立三类兴趣画像：长期兴趣、短期兴趣和即时兴趣。其中长期兴趣是指比较长的时间内（如一年），用户表现出的持续的稳定的兴趣；短期兴趣是指用户最近一段时间内（如一个月），用户表现出的兴趣；即时兴趣是指用户当前上下文环境中（如单次会话或单次浏览），用户表现出的临时兴趣。</p>
+<p>本文我们主要针对用户长期兴趣进行建模。对于短期兴趣，可以对相关的行为权重根据时间进行衰减；对于即时兴趣，可以对当前上下文中用户的交互行为进行建模。</p>
+<p>用户兴趣画像(长期兴趣)建立的流程如图2所示：</p>
+<p><img src="/2018/02/08/user_profile/user_interest_profile.png" alt="“用户兴趣画像流程”"></p>
+<center>图2 &ensp;用户兴趣画像流程</center>
+
+<ul>
+<li><p>兴趣标签确定<br>兴趣标签建立，要根据具体的业务需求，平台特点等进行构建。如对于电商平台，用户的兴趣更多的是指用户日常喜欢买的产品类别；对于资讯类平台，用户兴趣画像更多的是指资讯所属的类别、标签等；对于ins, in等图片社交平台，用户兴趣画像更多的是指图片内容或场景信息。</p>
+<p>具体而言，兴趣标签由两部分组成：兴趣类目和详细标签。对于兴趣类目，通过借鉴相关平台的分类信息（如新浪，优酷，pinterest等），结合自身平台特点，由专业人员制定。对于详细标签，可通过爬虫、nlp等相关技术，并依靠一定的人工审核进行确定。</p>
+</li>
+</ul>
+<ul>
+<li><p>用户兴趣挖掘</p>
+<p><strong>数据准备：</strong>主要包括基础行为日志、用户基础属性信息、item基础属性信息等。对于每个数据源，做数据清洗、数据规范化等，形成方便使用的中间数据。</p>
+<p><strong>特征提取和样本构建：</strong>根据准备好的中间数据，通过用户属性信息、item属性信息、行为日志构建正负样本。提取的特征可以为：基于user维度的特征、基于label维度的特征、基于user和label的组合特征。<br>user维度特征：user对应的曝光、点击、点赞、评论、发表、收藏、关注、搜索等相关特征<br>label维度特征：item对应的曝光、点击、点赞、评论、发表、收藏、label类别特征、搜索等特征<br>user和label组合特征：user对应label的曝光、点击、点赞、评论、发表、收藏、搜索等特征。<br>对于构建的正负样本，划分为训练集、验证集和测试集。</p>
+<p><strong>模型训练和预测：</strong>对上述步骤生成的正负样本，训练GBDT/LR模型。在互网产品中，很多情况下，由于负样本比例明显高于正样本，如点击行为小于曝光，购买行为小于曝光等。此时，需要对负样本进行采样后，再训练相关模型。在模型预测时，只保留预测得分大于一定阀值的用户兴趣。</p>
+<p><strong>兴趣协同扩展：</strong>仅通过模型预测阶段，存在一个潜在的问题，当用户对一个标签没发生过任何行为，或者行为次数很少时，该兴趣很可能永远不会被预测出来。一种比较好的方式是采用协同过滤，利用矩阵分解模型，得到用户和兴趣的隐语义向量，并根据在用户和兴趣在隐语义空间的内积计算用户对每个兴趣的得分。关于矩阵分解模型一般可采SGD和ALS算法进行求解，可参考[1]。</p>
+</li>
+<li><p>用户兴趣评估<br><strong>指标评估：</strong>在验证集上对准确率和召回率进行评估，并通过特征优化、模型优化不断提升验证集上的准召率。对于验证集上表现最好的特征和模型，作为最终的用户画像模型，并在测试集上评估效果。<br><strong>用户调研：</strong>对于预测出的用户画像结果，采用用户调研的方式进行评估。</p>
+</li>
+<li>用户兴趣画像应用<br>用户兴趣画像预测和评估通过后，可进一步用于个性化推荐、推送、个性化搜索排序等相关应用中。</li>
+</ul>
+<h2 id="年龄性别画像"><a href="#年龄性别画像" class="headerlink" title="年龄性别画像"></a>年龄性别画像</h2><p>年龄性别画像和兴趣画像构建过程比较类似，不同之处在于：年龄性别标签容易构建；年龄性别画像不需要通过矩阵分解进行标签扩展。</p>
+<ul>
+<li>标签确定<br><strong>性别标签：</strong>男、女分别对应一个标签。<br><strong>年龄标签：</strong>根据业务需求，确定需要划分的年龄段，每个年龄段对应一个年龄标签。</li>
+<li>年龄性别挖掘<br>年龄性别画像可以像兴趣画像那样，通过GBDT/LR模型进行预测。也可以采用其它方法，如[2]采用朴素贝叶斯相关方法进行挖掘，并通过在隐语义空间寻找k近邻，根据其邻居信息来平滑标签挖掘结果。</li>
+<li>年龄性别挖掘评估<br>年龄性别的评估和兴趣挖掘评估类似。但是，由于平台上用户的年龄和性别分布有时候很不均衡，对所有年龄段的用户进行评估会使得整体的评估结果受主体年龄段用户的影响很大，因此，我们采用对每个年龄段单独评估准确率，召回率和F值，再求所有类别的均值。对于性别的评估类似，对每个性别的用户单独评估，然后再求两个性别的评估均值。</li>
+<li>年龄性别挖掘应用<br>年龄性别挖掘好之后，可用于推荐、排序、定向广告、个性化用户运营等。</li>
+</ul>
+<h2 id="地域画像"><a href="#地域画像" class="headerlink" title="地域画像"></a>地域画像</h2><p>地域画像主要根据用户与地址相关的信息进行构建，相对兴趣、年龄性别画像，地域画像不需要比较复杂的模型，往往通过规则就可以得到比较合理的结果。此处我们以常驻城市挖掘为例进行说明。</p>
+<ul>
+<li>标签确定<br>可以直接使用城市名称作为地域标签。</li>
+<li>常驻地信息挖掘<br>用户常驻地相关的特征有：访问app时的gps地址，访问app时的ip对应的地址，手机号码归属地，用户注册时填写地址等。$s$</li>
+</ul>
+<h2 id="生命周期画像"><a href="#生命周期画像" class="headerlink" title="生命周期画像"></a>生命周期画像</h2><h2 id="其它画像"><a href="#其它画像" class="headerlink" title="其它画像"></a>其它画像</h2><p>风格画像,模块偏好画像，消费画像和生产画像<br>［1］https：//iamhere1.github.io/2018/01/03/mf/<br>［2］ Demographic Prediction Based on User’s Browsing<br>Behavior</p>
+
       
     </div>
 
@@ -507,7 +544,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像是什么"><span class="nav-number">1.</span> <span class="nav-text">用户画像是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像的作用"><span class="nav-number">2.</span> <span class="nav-text">用户画像的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像建模实践"><span class="nav-number">3.</span> <span class="nav-text">用户画像建模实践</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像是什么"><span class="nav-number">1.</span> <span class="nav-text">用户画像是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像的作用"><span class="nav-number">2.</span> <span class="nav-text">用户画像的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像建模"><span class="nav-number">3.</span> <span class="nav-text">用户画像建模</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣画像"><span class="nav-number">3.1.</span> <span class="nav-text">兴趣画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#年龄性别画像"><span class="nav-number">3.2.</span> <span class="nav-text">年龄性别画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地域画像"><span class="nav-number">3.3.</span> <span class="nav-text">地域画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期画像"><span class="nav-number">3.4.</span> <span class="nav-text">生命周期画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它画像"><span class="nav-number">3.5.</span> <span class="nav-text">其它画像</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
