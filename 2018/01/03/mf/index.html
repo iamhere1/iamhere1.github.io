@@ -92,12 +92,12 @@
 <meta property="og:site_name" content="个人学习博客">
 <meta property="og:description" content="矩阵分解模型分布式求解">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://learning.github.com/mf/data_model.png">
-<meta property="og:updated_time" content="2018-02-11T08:33:03.000Z">
+<meta property="og:image" content="http://learning.github.com/2018/01/03/mf/data_model.png">
+<meta property="og:updated_time" content="2018-02-11T09:45:52.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="矩阵分解模型的分布式求解">
 <meta name="twitter:description" content="矩阵分解模型分布式求解">
-<meta name="twitter:image" content="http://learning.github.com/mf/data_model.png">
+<meta name="twitter:image" content="http://learning.github.com/2018/01/03/mf/data_model.png">
 
 
 
@@ -362,7 +362,7 @@
 <p>$p_{u,k} = p_{u,k}+\alpha(e_{u,i}q_{i,k}-\lambda p_{u,k})\;(8)$</p>
 <p>$q_{i,k} = q_{i,k}+\alpha(e_{u,i}p_{u,k}-\lambda q_{i,k})\;(9)$</p>
 <h2 id="分布式实现in-openmit"><a href="#分布式实现in-openmit" class="headerlink" title="分布式实现in openmit"></a>分布式实现in openmit</h2><p>在openmit中的矩阵存储模型如下图所示:</p>
-<p><img src="/mf/data_model.png" alt="“矩阵存储模型”"> </p>
+<p><img src="/2018/01/03/mf/data_model.png" alt="“矩阵存储模型”"> </p>
 <p><center>图1：矩阵存储模型</center><br>我们假定user的数量远大于item数量，P矩阵代表user向量，Q矩阵代表item向量，R代表rating元素。此时我们将Q向量分布式存储在server集群，P向量分布式存储在worker集群，每个worker节点同时存储和该user相关联的rating元素R。</p>
 <p>每个worker节点在计算user向量的时候，由于只需要用到本地user向量、与本地user相关的item向量和rating元素,而user向量和相关的rating元素存储在本地，因此只需要从server端拉取对应的item向量，就可以根据式6和式7完成user和item的梯度计算。利用公式8更新user向量，并将item梯度向量push给server集群，server端根据当前item向量权重，及worker端push的item梯度信息，根据式9更新item向量。具体流程参见如下描述:</p>
 <p><strong>worker端流程</strong></p>
@@ -517,7 +517,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -534,7 +534,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

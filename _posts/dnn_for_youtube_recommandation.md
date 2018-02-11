@@ -42,7 +42,7 @@ YouTube的个性化推荐系统主要存在三方面的挑战：
 
 如图1[1]所示，整个系统包括两个深度神经网络, 一个用于生成候选集，另一个用于排序。
 
- <center>![“推荐系统结构”](/dnn_for_youtube_recommandation/recommand_system.png) </center>
+ <center>![“推荐系统结构”](dnn_for_youtube_recommandation/recommand_system.png) </center>
 
 图1：**推荐系统结构：包括触发和排序2个模块，触发模块用于从海量的数据中生成较少的候选集，排序模块对触发结果做更精细的选择**
 
@@ -76,7 +76,7 @@ $P(w\_t=i|U,C)=\frac{e^{v\_i\,u}}{\sum\_{j\in V} \; e^{v\_j\,u}}\;\;(式1)$
 对于每个video, 学习其在固定词典上的高维嵌入向量，并把这些向量作为神经网络的输入。每个用户的观看历史可用一个变长的video id序列来表示，每个video id可以通过嵌入的方式得到一个稠密的向量。这些向量通过聚合操作，得到单个向量（实验表示通过对所有向量求平均是最好的策略），作为神经网络的输入。这些video的嵌入向量，和其他的模型参数，都通过误差反向传播，并利用梯度下降方法进行学习。图2是触发模块的模型架构，其输入同时包括观看的video特征和和其他各种非video特征。
 
 <center>
-![“候选推荐”](/dnn_for_youtube_recommandation/recommand_matching.png) 
+![“候选推荐”](dnn_for_youtube_recommandation/recommand_matching.png) 
 </center>
 
 图2：**触发模块结构图：嵌入的稀疏特征和和非稠密特征同时作为模型的输入，同一个用户的多个嵌入特征通过平均的方式，得到固定的尺寸，并输入到隐藏层，所有的隐藏层都是全连接。在模型训练阶段，通过最小化交叉熵，并采用梯度下降的方法对sampled softmax进行求解。在serving阶段，通过一个近似最近邻的查找，得到数百个候选推荐结果**
@@ -92,7 +92,7 @@ $P(w\_t=i|U,C)=\frac{e^{v\_i\,u}}{\sum\_{j\in V} \; e^{v\_j\,u}}\;\;(式1)$
 **样本年龄：** 经过持续的观察得知，用户更加喜欢新内容，尽管不会以牺牲相关性为代价。如果我们简单地推荐新内容给用户，可能会使得推荐的内容不够相关。使用机器学习的方式进行推荐时，由于模型的训练，都来在历史样本，会使得历史的内容更容易得到推荐。论文的推荐系统产生的推荐结果，在训练窗口的几个星期内的流行度变化显示了用户在每个时间的平均喜好程度，同时表明video的流行度不是固定不变的，而是符合多项式分布的。为了去除不同时间因素的影响，我们把样本年龄特征加入模型进行训练，在server阶段，该特征置为零，表示当前时间在训练窗口的末尾。图3显示了该方法的效果：
 
 <center>
-![“样本年龄特征效果”](/dnn_for_youtube_recommandation/example_age_efficacy.png) 
+![“样本年龄特征效果”](dnn_for_youtube_recommandation/example_age_efficacy.png) 
 </center>
 
 **图3：加入样本年龄特征后模型效果，使用样本年龄作为特征后，模型可以精确表示video的上传时间和独立于时间的属性。没有这个特征，模型预测的是整个训练时间窗口的平均喜好程度**
@@ -108,7 +108,7 @@ $P(w\_t=i|U,C)=\frac{e^{v\_i\,u}}{\sum\_{j\in V} \; e^{v\_j\,u}}\;\;(式1)$
 用户观看视频的顺序会对最终的观看概率有较大影响。因此，在训练的时候，用历史发生的行为+历史行为之后的视频观看结果作为样本进行训练，要好于用所有的行为+随机的视频观看结果进行训练。如图4所示：
 
 <center>
-![“训练数据和lable组合方式”](/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png) 
+![“训练数据和lable组合方式”](dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png) 
 </center>
 
 **图4：lable和输入上下文。 选择样本标签及对应的上下文对于样本准备更有挑战，但是对于在线的效果提升非常有帮助,4-b的效果要远远好于4-a.在4-b中，$t\_{max}$表示训练窗口的最大观察时刻，$t\_{max}-t\_N$表示样本年龄特征**
@@ -119,7 +119,7 @@ $P(w\_t=i|U,C)=\frac{e^{v\_i\,u}}{\sum\_{j\in V} \; e^{v\_j\,u}}\;\;(式1)$
 通过增加特征和DNN的层数，可以显著提升模型的效果，如图5所示。1M数量的video和搜索token嵌入分别嵌入到256维的向量，每个用户观看历史为最近的50个video和最近的50个query分词结果，softmax层输出1M个video的多项式分布概率。模型的结构是塔型，最底层的单元数最多，每向上一层单元数都减少一半。0层的网络等价于一个线性分解器，和YouTube早先的推荐系统类似。在进行网络调优时，网络的宽度和层数逐渐增加，直到带来的收益不再增加或者收敛变得困难。
 
 <center>
-![“模型效果与特征、DNN层数的关系”](/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png) 
+![“模型效果与特征、DNN层数的关系”](dnn_for_youtube_recommandation/model_performance_with_feature_depth.png) 
 </center>
 
  **图5：模型效果与特征、DNN层数的关系。 Mean Average Precision (MAP) 随着特征、层数的增加而提升**
@@ -130,7 +130,7 @@ $P(w\_t=i|U,C)=\frac{e^{v\_i\,u}}{\sum\_{j\in V} \; e^{v\_j\,u}}\;\;(式1)$
 在排序阶段，由于只对几百个候选样本进行打分，可以采用更多特征描述video, user和video的关系。排序不仅可以上述rank模型的结果进行精选，也可用于对多个来源的候选结果进行融合。论文采用和触发模块类似的模型结构，并利用LR模型对候选结果进行打分和排序，并返回得分最高的video作为排序模块的结果输出。排序模型最终以平均每次曝光的观看时间作为优化目标，而非点击率，通过点击率作为优化目标容易推荐带有欺骗性的视屏，这些视频虽然容易吸引用户点击，但用户点进去后会很快离开。排序模型的架构如图6所示：
 
 <center>
-![“排序模块架构”](/dnn_for_youtube_recommandation/recommand_ranking.png) 
+![“排序模块架构”](dnn_for_youtube_recommandation/recommand_ranking.png) 
 </center>
 
  **图6：深度排序模型架构，输入包括univalent（如当前待评分的video id）和multivalent（如用户最近浏览过的多个video id）的离散特征的嵌入、连续特征的各个幂运算等，共输入几百个特征**
@@ -173,7 +173,7 @@ $\bar x = \int\_{-\infty}^xd\,f\;\;(式2)$
 结果显示，增加神经网络的层数和每一层的宽度，都可以提升模型的效果。在CPU预算允许的前提下，论文采用了1024 ReLU =》 512 ReLU =》 256 ReLU的配置。不使用连续特征的幂特征，损失增加0.2%。正负样本权值设置相等，损失增加非常明显，达到4.1%。
 
 <center>
-![“隐藏层配置对预测结果的影响”](/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png) 
+![“隐藏层配置对预测结果的影响”](dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png) 
 **表1：不同ReLU单元隐藏层配置对next-day的预测结果影响，评估指标是用户加权平均损失**</center>
 
 

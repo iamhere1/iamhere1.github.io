@@ -87,7 +87,7 @@ $q\_{i,k} = q\_{i,k}+\alpha(e\_{u,i}p\_{u,k}-\lambda q\_{i,k})\;(9)$
 
 在openmit中的矩阵存储模型如下图所示:
 
-![“矩阵存储模型”](/mf/data_model.png) 
+![“矩阵存储模型”](mf/data_model.png) 
 <center/>图1：矩阵存储模型</center>
 我们假定user的数量远大于item数量，P矩阵代表user向量，Q矩阵代表item向量，R代表rating元素。此时我们将Q向量分布式存储在server集群，P向量分布式存储在worker集群，每个worker节点同时存储和该user相关联的rating元素R。
 

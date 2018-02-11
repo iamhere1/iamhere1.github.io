@@ -92,12 +92,12 @@
 <meta property="og:site_name" content="个人学习博客">
 <meta property="og:description" content="决策树算法源码学习，其中模型的训练部分以随机森林的训练过程进行说明，决策树相当于树的数量为1的随机森林">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://learning.github.com/decision_tree/decision_tree_example.png">
-<meta property="og:updated_time" content="2018-02-11T08:33:03.000Z">
+<meta property="og:image" content="http://learning.github.com/2016/12/07/decision_tree/decision_tree_example.png">
+<meta property="og:updated_time" content="2018-02-11T09:43:37.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="spark mllib 决策树算法源码学习">
 <meta name="twitter:description" content="决策树算法源码学习，其中模型的训练部分以随机森林的训练过程进行说明，决策树相当于树的数量为1的随机森林">
-<meta name="twitter:image" content="http://learning.github.com/decision_tree/decision_tree_example.png">
+<meta name="twitter:image" content="http://learning.github.com/2016/12/07/decision_tree/decision_tree_example.png">
 
 
 
@@ -340,7 +340,7 @@
 <p>该文章来自于2016年后半年整理的算法源码笔记，由于之前没有写博客的习惯，都直接以笔记的形式存在电脑上，分享起来非常不便，因此抽出时间，将其整理成博客的形式，和大家一起学习交流。</p>
 <h1 id="决策树算法简要介绍"><a href="#决策树算法简要介绍" class="headerlink" title="决策树算法简要介绍"></a>决策树算法简要介绍</h1><p>决策树算法是一种常见的分类算法，也可以用于回归问题。相对于其他分类算法，决策树的优点在于简单,可解释性强；对特征尺度不敏感，不需要做太多的特征预处理工作;能够自动挖掘特征之间的关联关系。缺点是比较容易过拟合（通过随机森林可以避免过拟合）</p>
 <p>决策树是一个树形结构，其中叶子节点表示分类（或回归）结果，非叶子节点是属性判断判断节点，每个属性判断节点都选择样本的一个特征，并根据该特征的取值决定选择哪一个分支路径。在对样本进行预测时，从根节点开始直到叶子节点，对于路径上的每个分支节点，都根据其对应的属性取值选择下一个分支节点，直到叶子节点。整个完整的路径，表示对样本的预测过程。如图1所示，表示一个女孩在决定是否决定去相亲的一个过程，最终选择去或者不去，对应分类的结果，中间的各种条件对应相关的属性。</p>
-<center><br><img src="/decision_tree/decision_tree_example.png" alt="“决策树样例”"><br></center><br><center>图1：决策树样例：对女孩决定是否参加相亲的问题进行决策树建模</center>
+<center><br><img src="/2016/12/07/decision_tree/decision_tree_example.png" alt="“决策树样例”"><br></center><br><center>图1：决策树样例：对女孩决定是否参加相亲的问题进行决策树建模</center>
 
 
 <h2 id="决策树的训练"><a href="#决策树的训练" class="headerlink" title="决策树的训练"></a>决策树的训练</h2><p>从根节点开始，根据信息增益或其他条件，不断选择分裂的属性，直到生成叶子节点的过程。具体过程如下所示：</p>
@@ -528,7 +528,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -545,7 +545,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
