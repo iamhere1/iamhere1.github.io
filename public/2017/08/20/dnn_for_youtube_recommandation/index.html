@@ -92,18 +92,18 @@
 <meta property="og:site_name" content="个人学习博客">
 <meta property="og:description" content="论文来自YouTube团队使用DNN进行推荐方面的尝试，发表在16年9月的RecSys会议">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/recommand_system.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/recommand_matching.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/example_age_efficacy.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/recommand_ranking.png">
-<meta property="og:image" content="http://learning.github.com/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png">
-<meta property="og:updated_time" content="2018-02-11T08:57:52.000Z">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_matching.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/example_age_efficacy.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_ranking.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png">
+<meta property="og:updated_time" content="2018-02-11T09:45:30.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Deep Neural Networks for YouTube Recommendations论文学习">
 <meta name="twitter:description" content="论文来自YouTube团队使用DNN进行推荐方面的尝试，发表在16年9月的RecSys会议">
-<meta name="twitter:image" content="http://learning.github.com/dnn_for_youtube_recommandation/recommand_system.png">
+<meta name="twitter:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png">
 
 
 
@@ -353,7 +353,7 @@
 <p><strong>数据特点和噪声：</strong> 由于用户行为的稀疏性以及一些不确定的额外因素干扰，通过用户的历史行为进行推荐是非常困难的；在YouTube上很少能获得用户的显示喜欢的内容，因此只能根据隐式反馈信号进行建模；视频内容的元数据不够结构化；推荐算法的设计需要对所有这些数据特点都是鲁棒的。</p>
 <p>为了保持和google内其他产品的一致，YouTube内部正在做的一件事情是将深度学习作为一种通用的解决方案，用于解决几乎所有的机器学习问题。该论文成果建立在google brain开源的tensorflow之上。tensorflow提供了可以大规模训练各种网络结构的实验框架，本篇论文实验使用了几千亿的样本，训练十亿的参数。</p>
 <h1 id="系统概述"><a href="#系统概述" class="headerlink" title="系统概述"></a>系统概述</h1><p>如图1[1]所示，整个系统包括两个深度神经网络, 一个用于生成候选集，另一个用于排序。</p>
- <center><img src="/dnn_for_youtube_recommandation/recommand_system.png" alt="“推荐系统结构”"> </center>
+ <center><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png" alt="“推荐系统结构”"> </center>
 
 <p>图1：<strong>推荐系统结构：包括触发和排序2个模块，触发模块用于从海量的数据中生成较少的候选集，排序模块对触发结果做更精细的选择</strong></p>
 <p>触发模块通过输入用户的历史行为，从全量的集合里面，检索出视一个较小的子集（几百个），该模块通过协同过滤的方式，提供了相对弱一些的的个性化。用户之间的相似性通过观看的视频id, 搜索query的分词结果，以及用户的人口属性信息等来衡量。</p>
@@ -367,28 +367,28 @@
 <p><strong>高效的多类别训练：</strong>为了有效地完成数十亿类别的模型训练，论文采用了一种负采样的方法，首选根据负样本的分布采样负样本，然后通过重要性加权进行纠正，具体使用的方法可以参见文献【2】。对于每个样本，其真实的标签和负采样的类别标识都通过最小化交叉熵优化模型。实际上，每次都采样几千个样本，相对于传统的softmax, 其训练速度提升100倍以上。另外一种可行的高效训练方法是$hierarchical softmax$，但由于遍历每个节点等于在将无关的类别进行分类，这使得分类更加复杂，有损模型的效果。</p>
 <p>在线服务阶段，需要在几十毫秒内计算当前用户最可能喜欢的$N$个video, 这需要一个近似的得分方案，使得时间延迟对于类别数量的增长是低于线性的。论文的采用的是基于hash的方法【3】，从点积空间寻找最近的$N$个类别作为推荐的结果。</p>
 <h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>对于每个video, 学习其在固定词典上的高维嵌入向量，并把这些向量作为神经网络的输入。每个用户的观看历史可用一个变长的video id序列来表示，每个video id可以通过嵌入的方式得到一个稠密的向量。这些向量通过聚合操作，得到单个向量（实验表示通过对所有向量求平均是最好的策略），作为神经网络的输入。这些video的嵌入向量，和其他的模型参数，都通过误差反向传播，并利用梯度下降方法进行学习。图2是触发模块的模型架构，其输入同时包括观看的video特征和和其他各种非video特征。</p>
-<center><br><img src="/dnn_for_youtube_recommandation/recommand_matching.png" alt="“候选推荐”"><br></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_matching.png" alt="“候选推荐”"><br></center>
 
 <p>图2：<strong>触发模块结构图：嵌入的稀疏特征和和非稠密特征同时作为模型的输入，同一个用户的多个嵌入特征通过平均的方式，得到固定的尺寸，并输入到隐藏层，所有的隐藏层都是全连接。在模型训练阶段，通过最小化交叉熵，并采用梯度下降的方法对sampled softmax进行求解。在serving阶段，通过一个近似最近邻的查找，得到数百个候选推荐结果</strong></p>
 <h2 id="特征多样性"><a href="#特征多样性" class="headerlink" title="特征多样性"></a>特征多样性</h2><p>使用DNN作为矩阵分解方法的进一步泛化，可以带来的一个非常明显的优势：任何的连续特征和离散特征，都能比较容易地加入到模型中。</p>
 <p><strong>搜索历史：</strong>和观看历史非常近似，每个搜索query都可以分词为unigrams和bigrams，每个分词可以嵌入为向量，将用户的所有token对应的嵌入向量进行平均，形成代表用户搜索历史的特征。</p>
 <p><strong>人口属性：</strong>人口属性提供了非常重要的先验信息，有助于对新用户进行合理的推荐。地域和设备信息都通过嵌入的方式，拼接到整个模型的输入中。比较简单的离散或连续特征如用户性别、用户登录状态、用户年龄等，直接以归一化到0-1之间的实数形式输入到神经网络。</p>
 <p><strong>样本年龄：</strong> 经过持续的观察得知，用户更加喜欢新内容，尽管不会以牺牲相关性为代价。如果我们简单地推荐新内容给用户，可能会使得推荐的内容不够相关。使用机器学习的方式进行推荐时，由于模型的训练，都来在历史样本，会使得历史的内容更容易得到推荐。论文的推荐系统产生的推荐结果，在训练窗口的几个星期内的流行度变化显示了用户在每个时间的平均喜好程度，同时表明video的流行度不是固定不变的，而是符合多项式分布的。为了去除不同时间因素的影响，我们把样本年龄特征加入模型进行训练，在server阶段，该特征置为零，表示当前时间在训练窗口的末尾。图3显示了该方法的效果：</p>
-<center><br><img src="/dnn_for_youtube_recommandation/example_age_efficacy.png" alt="“样本年龄特征效果”"><br></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/example_age_efficacy.png" alt="“样本年龄特征效果”"><br></center>
 
 <p><strong>图3：加入样本年龄特征后模型效果，使用样本年龄作为特征后，模型可以精确表示video的上传时间和独立于时间的属性。没有这个特征，模型预测的是整个训练时间窗口的平均喜好程度</strong></p>
 <h2 id="标签和上下文选择"><a href="#标签和上下文选择" class="headerlink" title="标签和上下文选择"></a>标签和上下文选择</h2><p>通过解决一个问题，然后将这个计算结果转换到特定的上下文环境中使用，是推荐业务经常使用的一种方式，这种方式对于线上的AB测试非常重要，但是离线实验对于在线的效果不是很好评估。</p>
 <p><strong>训练样本来自所有用户观看记录，而不只是推荐结果的观看记录。否则，很难推荐出新的video, 而只是在旧的内容进行exploitation；通过确保每个用户具有相同样本数，可以避免部分活跃用户的行为带来的训练误差，提升模型的在线效果；为了防止模型在原始问题上过拟合，对于分类器信息的使用需要非常谨慎。例如用户刚搜了一个query, 分类器在进行推荐时会选择搜索结果页中对应的视频，但是推荐用户刚搜过视频对于用户的体验是不好的，通过将原始的query分词后，抛弃序列信息，以bag of words的方式提供特征，分类器会不受原始搜索结果的影响</strong></p>
 <p>用户观看视频的顺序会对最终的观看概率有较大影响。因此，在训练的时候，用历史发生的行为+历史行为之后的视频观看结果作为样本进行训练，要好于用所有的行为+随机的视频观看结果进行训练。如图4所示：</p>
-<center><br><img src="/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png" alt="“训练数据和lable组合方式”"><br></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png" alt="“训练数据和lable组合方式”"><br></center>
 
 <p><strong>图4：lable和输入上下文。 选择样本标签及对应的上下文对于样本准备更有挑战，但是对于在线的效果提升非常有帮助,4-b的效果要远远好于4-a.在4-b中，$t_{max}$表示训练窗口的最大观察时刻，$t_{max}-t_N$表示样本年龄特征</strong></p>
 <h2 id="特征与DNN层数实验"><a href="#特征与DNN层数实验" class="headerlink" title="特征与DNN层数实验"></a>特征与DNN层数实验</h2><p>通过增加特征和DNN的层数，可以显著提升模型的效果，如图5所示。1M数量的video和搜索token嵌入分别嵌入到256维的向量，每个用户观看历史为最近的50个video和最近的50个query分词结果，softmax层输出1M个video的多项式分布概率。模型的结构是塔型，最底层的单元数最多，每向上一层单元数都减少一半。0层的网络等价于一个线性分解器，和YouTube早先的推荐系统类似。在进行网络调优时，网络的宽度和层数逐渐增加，直到带来的收益不再增加或者收敛变得困难。</p>
-<center><br><img src="/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png" alt="“模型效果与特征、DNN层数的关系”"><br></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png" alt="“模型效果与特征、DNN层数的关系”"><br></center>
 
 <p> <strong>图5：模型效果与特征、DNN层数的关系。 Mean Average Precision (MAP) 随着特征、层数的增加而提升</strong></p>
 <h1 id="排序模块"><a href="#排序模块" class="headerlink" title="排序模块"></a>排序模块</h1><p>在排序阶段，由于只对几百个候选样本进行打分，可以采用更多特征描述video, user和video的关系。排序不仅可以上述rank模型的结果进行精选，也可用于对多个来源的候选结果进行融合。论文采用和触发模块类似的模型结构，并利用LR模型对候选结果进行打分和排序，并返回得分最高的video作为排序模块的结果输出。排序模型最终以平均每次曝光的观看时间作为优化目标，而非点击率，通过点击率作为优化目标容易推荐带有欺骗性的视屏，这些视频虽然容易吸引用户点击，但用户点进去后会很快离开。排序模型的架构如图6所示：</p>
-<center><br><img src="/dnn_for_youtube_recommandation/recommand_ranking.png" alt="“排序模块架构”"><br></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_ranking.png" alt="“排序模块架构”"><br></center>
 
 <p> <strong>图6：深度排序模型架构，输入包括univalent（如当前待评分的video id）和multivalent（如用户最近浏览过的多个video id）的离散特征的嵌入、连续特征的各个幂运算等，共输入几百个特征</strong></p>
 <h2 id="特征表示"><a href="#特征表示" class="headerlink" title="特征表示"></a>特征表示</h2><p>排序模块包括离散特征（单值特征和多值特征）和连续特征，其中离散特征包括二值特征（如是否登录状态）和多个值的离散特征（如video id）, 多个离散值的特征包括univalent（如当前待评分的video id）和multivalent（如用户最近浏览过的多个video id），论文也使用了其他特征，如是否描述item(如曝光)，是否描述user/context(如query)</p>
@@ -402,7 +402,7 @@
 <h2 id="期望浏览时间建模"><a href="#期望浏览时间建模" class="headerlink" title="期望浏览时间建模"></a>期望浏览时间建模</h2><p>论文的目标是对期望浏览时间进行建模，其中正样本是有点击行为的样本，负样本是没有发生点击行为的样本。每个正样本都有对应的浏览时间，负样本的浏览时间为0. 为了预测期望浏览时间，采用加权逻辑回归的方法，正样本的权重是对应的浏览时间，负样本使用单位权重，采用交叉熵作为目标函数。这样模型学习的优势比odds为$\frac{\sum T_i}{N-k}$, 关于优势比的定义可参见【3】。其中$N$是训练样本数，$k$是正样本数，$T_i$对应第i个视频的浏览时间。由于实际正样本的数量比较少，优势比等价于$E[T](1+P)$, $P$是点击率，$E[T]$是期望浏览时间，由于$P$比较小,该目标进一步可以近似为平均观看时间。在预测阶段，使用指数函数$e^x$作为激活函数得到优势比odds, 作为预测的平均浏览时间的近似值。</p>
 <h2 id="针对隐藏层的实验"><a href="#针对隐藏层的实验" class="headerlink" title="针对隐藏层的实验"></a>针对隐藏层的实验</h2><p>表1是不同隐藏层配置对应的对于next-day的预测结果，评估指标是<strong>用户加权平均损失</strong>，每个配置都是评估同一个页面的正负样本，如果正样本分数低于负样本，那么正样本的浏览时间是<strong>预测错误浏览时长</strong>， <strong>用户加权平均损失</strong>定义为<strong>所有预测错误的浏览时间占比所有评估对的浏览时间之和</strong></p>
 <p>结果显示，增加神经网络的层数和每一层的宽度，都可以提升模型的效果。在CPU预算允许的前提下，论文采用了1024 ReLU =》 512 ReLU =》 256 ReLU的配置。不使用连续特征的幂特征，损失增加0.2%。正负样本权值设置相等，损失增加非常明显，达到4.1%。</p>
-<center><br><img src="/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png" alt="“隐藏层配置对预测结果的影响”"><br><strong>表1：不同ReLU单元隐藏层配置对next-day的预测结果影响，评估指标是用户加权平均损失</strong></center>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png" alt="“隐藏层配置对预测结果的影响”"><br><strong>表1：不同ReLU单元隐藏层配置对next-day的预测结果影响，评估指标是用户加权平均损失</strong></center>
 
 
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>论文描述了YouTube视频推荐的深度网络结构，主要分为触发模块和排序模块</p>
@@ -521,7 +521,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-count">10</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -538,7 +538,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">23</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
