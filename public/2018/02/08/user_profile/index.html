@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="用户画像," />
+  <meta name="keywords" content="用户画像,兴趣挖掘,年龄性别挖掘,常住地挖掘,生命周期画像,流失预测模型," />
 
 
 
@@ -85,7 +85,7 @@
 
 
 <meta name="description" content="用户画像学习与总结">
-<meta name="keywords" content="用户画像">
+<meta name="keywords" content="用户画像,兴趣挖掘,年龄性别挖掘,常住地挖掘,生命周期画像,流失预测模型">
 <meta property="og:type" content="article">
 <meta property="og:title" content="用户画像学习与总结">
 <meta property="og:url" content="http://learning.github.com/2018/02/08/user_profile/index.html">
@@ -94,7 +94,9 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/function_of_user_profile.png">
 <meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/user_interest_profile.png">
-<meta property="og:updated_time" content="2018-02-10T08:26:18.000Z">
+<meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/life_recycle.png">
+<meta property="og:image" content="http://learning.github.com/2018/02/08/user_profile/life_recycle_conversion.png">
+<meta property="og:updated_time" content="2018-02-11T07:56:33.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="用户画像学习与总结">
 <meta name="twitter:description" content="用户画像学习与总结">
@@ -326,17 +328,18 @@
       
         <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    extensions： ["tex2jax.js"],
-    jax： ["input/TeX"],
-    tex2jax： {
-      inlineMath： [ ['$','$'], ['\\(','\\)'] ],
-      displayMath： [ ['$$','$$']],
-      processEscapes： true
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
     }
   });
 </script>
-<script type="text/javascript" src="https：//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http：//myserver.com/MathJax/config/local/local.js">
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
 </script>
+
 
 <h1 id="用户画像是什么"><a href="#用户画像是什么" class="headerlink" title="用户画像是什么"></a>用户画像是什么</h1><p>用户画像是根据用户的社会属性及各类行为，抽象出一个标签化的用户模型。其核心工作主要包括两点：</p>
 <p><strong>构建标签集：</strong> 根据实际业务需求、平台、数据等，确定用户画像的标签集合。如针对不同需求，可能需要用户兴趣画像、年龄性别画像、人群画像、地址画像、生命周期画像等，每类用户画像都可以确定对应的标签集合。</p>
@@ -383,17 +386,74 @@
 </ul>
 <h2 id="年龄性别画像"><a href="#年龄性别画像" class="headerlink" title="年龄性别画像"></a>年龄性别画像</h2><p>年龄性别画像和兴趣画像构建过程比较类似，不同之处在于：年龄性别标签容易构建；年龄性别画像不需要通过矩阵分解进行标签扩展。</p>
 <ul>
-<li>标签确定<br><strong>性别标签：</strong>男、女分别对应一个标签。<br><strong>年龄标签：</strong>根据业务需求，确定需要划分的年龄段，每个年龄段对应一个年龄标签。</li>
-<li>年龄性别挖掘<br>年龄性别画像可以像兴趣画像那样，通过GBDT/LR模型进行预测。也可以采用其它方法，如[2]采用朴素贝叶斯相关方法进行挖掘，并通过在隐语义空间寻找k近邻，根据其邻居信息来平滑标签挖掘结果。</li>
-<li>年龄性别挖掘评估<br>年龄性别的评估和兴趣挖掘评估类似。但是，由于平台上用户的年龄和性别分布有时候很不均衡，对所有年龄段的用户进行评估会使得整体的评估结果受主体年龄段用户的影响很大，因此，我们采用对每个年龄段单独评估准确率，召回率和F值，再求所有类别的均值。对于性别的评估类似，对每个性别的用户单独评估，然后再求两个性别的评估均值。</li>
-<li>年龄性别挖掘应用<br>年龄性别挖掘好之后，可用于推荐、排序、定向广告、个性化用户运营等。</li>
+<li><p>标签确定<br><strong>性别标签：</strong>男、女分别对应一个标签。<br><strong>年龄标签：</strong>根据业务需求，确定需要划分的年龄段，每个年龄段对应一个年龄标签。 </p>
+</li>
+<li><p>年龄性别挖掘<br>年龄性别画像可以像兴趣画像那样，通过GBDT/LR模型进行预测。也可以采用其它方法，如[2]采用朴素贝叶斯相关方法进行挖掘，并通过在隐语义空间寻找k近邻，根据其邻居信息来平滑标签挖掘结果。</p>
+</li>
+<li><p>年龄性别挖掘评估<br>年龄性别的评估和兴趣挖掘评估类似。但是，由于平台上用户的年龄和性别分布有时候很不均衡，对所有年龄段的用户进行评估会使得整体的评估结果受主体年龄段用户的影响很大，因此，我们采用对每个年龄段单独评估准确率，召回率和F值，再求所有类别的均值。对于性别的评估类似，对每个性别的用户单独评估，然后再求两个性别的评估均值。</p>
+</li>
+<li><p>年龄性别挖掘应用<br>年龄性别挖掘好之后，可用于推荐、排序、定向广告、个性化用户运营等。</p>
+</li>
 </ul>
-<h2 id="地域画像"><a href="#地域画像" class="headerlink" title="地域画像"></a>地域画像</h2><p>地域画像主要根据用户与地址相关的信息进行构建，相对兴趣、年龄性别画像，地域画像不需要比较复杂的模型，往往通过规则就可以得到比较合理的结果。此处我们以常驻城市挖掘为例进行说明。</p>
+<h2 id="地域画像"><a href="#地域画像" class="headerlink" title="地域画像"></a>地域画像</h2><p>地域画像主要根据用户与地址相关的信息进行构建，相对兴趣、年龄性别画像，地域画像不需要比较复杂的模型，往往通过规则就可以得到比较合理的结果。此处我们以常住地用户画像挖掘为例进行说明。</p>
 <ul>
-<li>标签确定<br>可以直接使用城市名称作为地域标签。</li>
-<li>常驻地信息挖掘<br>用户常驻地相关的特征有：访问app时的gps地址，访问app时的ip对应的地址，手机号码归属地，用户注册时填写地址等。$s$</li>
+<li><p>标签确定<br>可以直接使用省份、城市、区、县等名称作为地域标签。</p>
+</li>
+<li><p>地域画像挖掘<br>用户常住地相关的特征有：访问app时的gps地址，访问app时的ip对应的地址，手机号码归属地，用户注册时填写地址等,可以根据每个特征计算用户对应地址的得分，然后对各个来源的计算结果进行加权，最后根据加权结果确定用户常住地信息。</p>
+<ul>
+<li><p><strong>用户对应某个特征的地址得分：</strong><br>根据特征$s$计算的用户$u$对于地址$i$的得分如式1所示:<br>$score_{u,s,i} = \sum \lambda_t \; p_{u,s,t,i}\;\; (式1)$<br>其中，$p_{u,s,t,i}$表示用户$u$在距离当前日期的第$t$天，对应特征$s$和地址$i$访问app的次数， $\lambda_t$为时间衰减系数，可以按照如下式2和式3进行计算。<br>$\lambda_t= \begin{cases}<br>1-t/T\,  &amp; t\leq T\\<br>0,  &amp; t&gt;T<br>\end{cases}<br>\;\;(式2)$<br>$\lambda_t=\lambda_0 \alpha^t\;\;(式3)$<br>其中$\alpha$为0到1之间的数值。</p>
+</li>
+<li><p><strong>容和各特征s对应地址得分：</strong><br>$score_{u,i}=\sum score_{u,s,i}\;w_s\;attr_i$<br>其中$w_s$是根据特征重要性设定的权重，$attr_i$是属性$i$对应的权重，如可以根据地址是否够详细，设置相对应的的权重。地址越详细，权重越高。</p>
+</li>
+<li><p><strong>确定用户常住地</strong><br>对于所有地址得分从高到低排序，得到列表$L$。然后从高到低开始，如果连续两个地址得分相差不大，则将当前地址加入常住地集合$S$，继续向后遍历列表；否则停止遍历。此时列列表$S$中所有地址为用户的所有常住地。</p>
+</li>
 </ul>
-<h2 id="生命周期画像"><a href="#生命周期画像" class="headerlink" title="生命周期画像"></a>生命周期画像</h2><h2 id="其它画像"><a href="#其它画像" class="headerlink" title="其它画像"></a>其它画像</h2><p>风格画像,模块偏好画像，消费画像和生产画像<br>［1］https：//iamhere1.github.io/2018/01/03/mf/<br>［2］ Demographic Prediction Based on User’s Browsing<br>Behavior</p>
+</li>
+<li><p>地域画像评估<br>地域信息的挖掘结果，来自和标签强相关的特征统计，准确率比较高。在评估时，可以将某一项特征的统计结果作为标签，衡量根据其它特征挖掘得到的结果的准确率和召回率。</p>
+</li>
+<li><p>地域画像应用<br>用户地域画像可用于精细化用户运营，定向广告等相关场景。</p>
+</li>
+</ul>
+<h2 id="生命周期画像"><a href="#生命周期画像" class="headerlink" title="生命周期画像"></a>生命周期画像</h2><p>用户生命周期画像，对于公司了解产品趋势，分析产品对用户的粘性具有重要作用。同时，可针对不同生命周期的用户采用不同的运营方案，提升运营效果，减少对用户的干扰。如针对初期用户进行功能的教育引导，对流失用户进行唤醒等。另外我们还可以针对非流失用户，建立流失预测模型，进行流失预警。</p>
+<h3 id="生命周期画像划分"><a href="#生命周期画像划分" class="headerlink" title="生命周期画像划分"></a>生命周期画像划分</h3><p>由于app功能、用户使用频次、使用需求等不同，其对应生命周期划分也不完全一致。可采用如下方法来划分用户的生命周期：</p>
+<ul>
+<li><p>得到留存用户<br>根据所有用户注册后，$N$天后是否还在使用app，得到$N$天后的留存用户集合S。一般$N$可以根据app性质设定，原则是$N$天后用户还在使用app，证明该用户已经习惯使用该app。  </p>
+</li>
+<li><p>留存用户使用频次趋势统计<br>对留存用户，统计从注册后到稳定使用app之间，平均每个时间周期$T$的登录频次。综合所有用户情况，得到每个时间周期$T$的平均使用频次。其中时间周期$T$根据app性质进行设定。</p>
+</li>
+<li><p>标签确定及划分标注<br>根据每个时间周期$T$的登录频次变化趋势，确定生命周期的标签及划分标准。</p>
+<ul>
+<li>标签确定<br>我们根据登录趋势变化，确定生命周期标准。如图3所示(虚拟数据)，在第一个到第二个周期$T$用户登录频次变化非常明明显，从第二个到第八个周期用户登录频次变化相对较小，从第八后周期之后用户登录频次几本趋于稳定。基于此，我们可以确定划分标准为<strong>初级用户、成长期用户、稳定期用户和流失用户</strong>。其中初期用户对应登录频次较高，成长期用户对应登录频次逐渐降低，稳定期用户是登录频次趋于稳定，流失用户是$N$天后不再登录app的用户。</li>
+</ul>
+<p><img src="/2018/02/08/user_profile/life_recycle.png" alt="“用户登录频次变化”"></p>
+<center>图3 &ensp;用户登录频次变化</center>
+
+<ul>
+<li>划分标准<br>对于流失用户，明确为为$N$天后不再登录的用户。对于其它三个标签划分，一种比较直观的划分是：根据图3的两个箭头s1和s2作为分界点，s1划分初级用户和成长期用户，s2划分成长期用户和稳定期用户。但是由于不同用户使用频率存在有较大差别，会导致划分不合理的情况。如有的用户可能只使用过很少的次数就进入成熟期。因此，我们可以使用的方法是：<strong>将对应周期结束时的登录总次数作为划分标准</strong>。我们假定$f$表示用户当前使用app次数，具体划分标准如下所示：<br><strong>初期用户：</strong> $f \lt 12$<br><strong>成长期用户：</strong> $12\leq f \leq 63$， 63为前7个周期$T$的总登录次数。<br><strong>稳定期用户：</strong> $f \gt 63$</li>
+</ul>
+</li>
+</ul>
+<h3 id="流失预测"><a href="#流失预测" class="headerlink" title="流失预测"></a>流失预测</h3><p>用户的各个生命周期之间存在转换关系，如图5所示：初期用户、成长期用户、稳定期用户。如果$N$天未登录，会变成流失用户。流失用户重新登录，则变为初期用户。此处，我们认为如果用户$N$天未来，对于app有些新功能没有使用过，需要引导教育。因此，该类用户被划分为初期用户。</p>
+<p>  <img src="/2018/02/08/user_profile/life_recycle_conversion.png" alt="“用户生命周期转换”"></p>
+<center>图4 &ensp;用户生命周期转换</center>
+
+
+<p>用户流失预测模型和兴趣画像构建类似，不同之处在于：标签易确定；不需要矩阵分解进行标签扩展；需要采用较多的时间序列相关特征。</p>
+<ul>
+<li><p>标签确定<br>对于用户流失预测模型，主要包括2个标签:预警用户和正常用户</p>
+</li>
+<li><p>模型训练和预测<br>模型的训练和预测和兴趣画像基本类似，主要是使用的特征不同、不需要进行标签扩展。</p>
+<ul>
+<li>特征提取<br>用户使用app频率、频率的变化趋势、使用功能等，都和用户是否将要流失有很大的关系。我们可以提取用户每个周期的登录频次、间隔的1-N个周期登录频次差值、每个周期使用的各个功能模块的频次、间隔1－N个周期各个功能模块使用频次的差值等，作为流失预测模型的特征。</li>
+<li>模型训练和预测<br>用户在平台上注册的时间不同，如有的用户注册只有不到一周，有的用户可能超过几年。针对这种情况，可以针对注册时间不同的用户，划分为多个类别，同一个类别的用户注册日期相近。这样，对于注册时间距离当前时间较近（如不到1周）的用户，可以采用其所有时间段的行为进行训练和预测。对于注册时间距离当前时间较长（如超过2个月）的用户，可以采用最近一段时间（如最近2个月）的行为进行训练和预测。</li>
+</ul>
+</li>
+<li><p>模型评估<br>对于训练好的模型，在测试集上评估模型的准确率、召回率和F值</p>
+</li>
+<li>模型应用<br>针对处于未流失用户，通过流失预测模型，可以有效地找出即将流失的用户，从而进行用户预警，通过相关运营手段防止其变为流失用户。</li>
+</ul>
+<h2 id="其它画像"><a href="#其它画像" class="headerlink" title="其它画像"></a>其它画像</h2><p>除了上述画像之外，还可以从很多的维度去描述用户，并为之建立画像。如人群画像、功能偏好画像等，p图相关画像（如贴纸风格画像、滤镜画像等）。针对社交网络，可以有消费兴趣画像、生产兴趣画像等。各类画像的挖掘方法很多，本文描述了自己学习过程中使用的一些方法，希望能对大家有用。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1] iamhere1, “矩阵分解模型的分布式求解”, 2018.01, https：//iamhere1.github.io/2018/01/03/mf/<br>[2] Hu J, Zeng H J, Li H, et al. “Demographic prediction based on user’s browsing behavior”, International Conference on World Wide Web, 2007.05, pp.151-160.</p>
 
       
     </div>
@@ -416,6 +476,16 @@
         <div class="post-tags">
           
             <a href="/tags/用户画像/" rel="tag">#用户画像</a>
+          
+            <a href="/tags/兴趣挖掘/" rel="tag">#兴趣挖掘</a>
+          
+            <a href="/tags/年龄性别挖掘/" rel="tag">#年龄性别挖掘</a>
+          
+            <a href="/tags/常住地挖掘/" rel="tag">#常住地挖掘</a>
+          
+            <a href="/tags/生命周期画像/" rel="tag">#生命周期画像</a>
+          
+            <a href="/tags/流失预测模型/" rel="tag">#流失预测模型</a>
           
         </div>
       
@@ -515,7 +585,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -544,7 +614,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像是什么"><span class="nav-number">1.</span> <span class="nav-text">用户画像是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像的作用"><span class="nav-number">2.</span> <span class="nav-text">用户画像的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像建模"><span class="nav-number">3.</span> <span class="nav-text">用户画像建模</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣画像"><span class="nav-number">3.1.</span> <span class="nav-text">兴趣画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#年龄性别画像"><span class="nav-number">3.2.</span> <span class="nav-text">年龄性别画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地域画像"><span class="nav-number">3.3.</span> <span class="nav-text">地域画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期画像"><span class="nav-number">3.4.</span> <span class="nav-text">生命周期画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它画像"><span class="nav-number">3.5.</span> <span class="nav-text">其它画像</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像是什么"><span class="nav-number">1.</span> <span class="nav-text">用户画像是什么</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像的作用"><span class="nav-number">2.</span> <span class="nav-text">用户画像的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用户画像建模"><span class="nav-number">3.</span> <span class="nav-text">用户画像建模</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#兴趣画像"><span class="nav-number">3.1.</span> <span class="nav-text">兴趣画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#年龄性别画像"><span class="nav-number">3.2.</span> <span class="nav-text">年龄性别画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#地域画像"><span class="nav-number">3.3.</span> <span class="nav-text">地域画像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期画像"><span class="nav-number">3.4.</span> <span class="nav-text">生命周期画像</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#生命周期画像划分"><span class="nav-number">3.4.1.</span> <span class="nav-text">生命周期画像划分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流失预测"><span class="nav-number">3.4.2.</span> <span class="nav-text">流失预测</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其它画像"><span class="nav-number">3.5.</span> <span class="nav-text">其它画像</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
           </div>
         </section>
