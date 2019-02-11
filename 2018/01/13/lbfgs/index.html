@@ -1,0 +1,909 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="lbfgs,拟牛顿算法,非线性优化," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="lbfgs算法具备牛顿法收敛速度快的优点，同时又不需要存储和计算完整的hessian矩阵，能够节省大量的存储和计算资源，非常适用于解决无约束的大规模的非线性优化问题。">
+<meta name="keywords" content="lbfgs,拟牛顿算法,非线性优化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lbfgs算法与源码学习">
+<meta property="og:url" content="http://learning.github.com/2018/01/13/lbfgs/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="lbfgs算法具备牛顿法收敛速度快的优点，同时又不需要存储和计算完整的hessian矩阵，能够节省大量的存储和计算资源，非常适用于解决无约束的大规模的非线性优化问题。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-11T09:58:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="lbfgs算法与源码学习">
+<meta name="twitter:description" content="lbfgs算法具备牛顿法收敛速度快的优点，同时又不需要存储和计算完整的hessian矩阵，能够节省大量的存储和计算资源，非常适用于解决无约束的大规模的非线性优化问题。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> lbfgs算法与源码学习 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                lbfgs算法与源码学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-13T00:00:00+08:00" content="2018-01-13">
+              2018-01-13
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/模型与算法/" itemprop="url" rel="index">
+                    <span itemprop="name">模型与算法</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/01/13/lbfgs/" class="leancloud_visitors" data-flag-title="lbfgs算法与源码学习">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+<p>LBFGS（limited-memory BFGS或limited-strorate BFGS）算法具备牛顿法收敛速度快的优点，同时又不需要存储和计算完整的hessian矩阵，能够节省大量的存储和计算资源，非常适用于解决无约束的大规模非线性优化问题。</p>
+<p>本文从牛顿法出发，先简要介绍牛顿法、拟牛顿法，然后从分别从原理和源码实现的角度介绍lbfgs优化算法。其源码主要来自chokkan等人贡献[1]。</p>
+<h1 id="牛顿法"><a href="#牛顿法" class="headerlink" title="牛顿法"></a>牛顿法</h1><p><strong>原始牛顿法:</strong></p>
+<p>目标函数: $min\;\;f(x)\;(1)$</p>
+<p>函数$f(x)$在$x=x_k$附近进行二阶泰勒展开，如下所示：</p>
+<p>$f(x) \approx f(x_k) + \bigtriangledown f(x_k)(x-x_k) + \frac{1}{2}(x-x_k)^T \bigtriangledown^2 f’’(x_k)(x-x_k)\;(2)$</p>
+<p>为了求$f(x)$的极小值,令$f(x)$的导数为0，得到：</p>
+<p>$x = x_k - H_k^{-1}g_k\;(3)$</p>
+<p>其中$g_k$为函数$f$在$x=x_k$的一阶导数， $H_k$为函数$f$在$x=x_k$的二阶导数(hessian矩阵)。<br>因此，为求解下次迭代结果，可直接令:</p>
+<p>$x_{k+1}=x_k-H_k^{-1}g_k\;(4)$</p>
+<p>算法在利用牛顿法求解时，从$x=x_0$出发，逐步迭代直到终止。终止的条件可以是梯度的二范数小于一定值，或者达到最大迭代次数等。</p>
+<p><strong>阻尼牛顿法:</strong></p>
+<p>原始牛顿法是固定步长迭代，对于非二次型目标函数，不能保证目标函数值稳定下降。严重情况下可能造成迭代点序列发散，使得计算失败。为消除该缺点，采用阻尼牛顿法，在更新迭代点时寻求最优步长$ \lambda_k$。</p>
+<p>$\lambda_k=argmin_{\lambda}f(x_k+\lambda H_k^{-1}g_k)\;(5)$</p>
+<p>$x_{k+1}=x_k+\lambda H_k^{-1}g_k\;(6)$</p>
+<p><strong>牛顿法及阻尼牛顿法优点：</strong>当目标函数$f$为二次函数，且hessian矩阵正定时，通过牛顿法一步就可以得到最优解。当目标函数$f$为非二次函数，但是其二次性较强或迭代点已进入极小点附近，其收敛速度也很快。</p>
+<p><strong>牛顿法及阻尼牛顿法缺点:</strong>要求目标函数$f$需要具有连续的一、二阶导数，且hessian矩阵正定；当特征维度很高时，hessian矩阵存储需要很大空间，求逆计算量也很大，不适合用于大规模问题的优化。</p>
+<h1 id="拟牛顿法"><a href="#拟牛顿法" class="headerlink" title="拟牛顿法"></a>拟牛顿法</h1><p>拟牛顿法的核心思想是：直接构造hessian矩阵或hessian矩阵的逆，从而在构造的近似hessian矩阵基础上按照式4或式6进行迭代求解。</p>
+<h2 id="拟牛顿条件"><a href="#拟牛顿条件" class="headerlink" title="拟牛顿条件"></a>拟牛顿条件</h2><p>函数$f(x)$在$x=x_{k+1}$附近进行二阶泰勒展开，如下所示：</p>
+<p>$f(x) \approx f(x_{k+1}) + \bigtriangledown f(x_{k+1})(x-x_{k+1}) + \frac{1}{2}(x-x_{k+1})^T \bigtriangledown^2 f(x_{k+1})(x-x_{k+1})\;(7)$</p>
+<p>对上式两边对$x$求导，如下所示:</p>
+<p>$\bigtriangledown f(x) \approx \bigtriangledown f(x_{k+1}) + \bigtriangledown^2 f’’(x_{k+1})(x-x_{k+1})\;(7)$</p>
+<p>取$x=x_k$,则由式7可以得到：</p>
+<p>$g_{k+1}-g_k \approx  H_{k+1}(x_{k+1}-x_k)\;(8)$</p>
+<p>其中$g_k$为函数$f$在$x=x_k$的一阶导数， $H_{k+1}$为函数$f$在$x=x_{k+1}$的二阶导数(hessian矩阵)。令$y_k=g_{k+1}-g_k$, $s_k=x_{k+1}-x_k$, $G_{k+1}=H^{-1}_{k+1}$ 得：</p>
+<p>$y_k \approx H_{k+1} s_k\;(9)$</p>
+<p>$s_k \approx G_{k+1}y_k\;(10)$</p>
+<p>式9和式10是拟牛顿条件，在迭代过程中对hessian矩阵$H_{k+1}$做近似，或者对hessian矩阵的逆$G_{k+1}$做近似，而不是直接求解hessian矩阵，就是拟牛顿法。比较常用的拟牛顿法包括DFP算法和BFGS算法。</p>
+<h2 id="DFP算法"><a href="#DFP算法" class="headerlink" title="DFP算法"></a>DFP算法</h2><p>DFP算法的核心是通过迭代对hessian矩阵的逆进行近似，迭代公式：<br>$G_{k+1}=G_k + \bigtriangleup G_k, \; k = 0, 1, 2, … \;(11)$</p>
+<p>其中$G_k$可以通过单位矩阵构造，关键在于如何构造$\bigtriangleup G_k$，其构造过程如下：<br>为保证对称性，我们假定:</p>
+<p>$\bigtriangleup G_k=\alpha uu^T + \beta vv^T\;(12)$</p>
+<p>将式11和式12代入式10，可得：</p>
+<p>$s_k \approx G_{k+1}y_k$</p>
+<p>$=&gt;s_k = (G_k + \bigtriangleup G_k)y_k=G_ky_k+\alpha u^Ty_ku+\beta v^Ty_kv$</p>
+<p>$=&gt;s_k-G_ky_k=\alpha u^Ty_ku+\beta v^Ty_kv；（13）$</p>
+<p>为使得式12成立，直接使$\alpha u^Ty_k=1$, $\beta v^Ty_k=-1, u=s_k, v=G_ky_k$，得到$\alpha=\frac{1}{s^Ty_k}$, $\beta = -\frac{1}{y^T_kG_ky_k}$, 将$\alpha,\beta,u,v$代入式12，得：</p>
+<p>$\bigtriangleup G_k=\frac{s_ks^T_k}{s^T_ky_k}-\frac{G_ky_ky^T_kG_k}{y^T_kG_ky_k} \;(14)$</p>
+<p>DFP算法根据式11和式14，迭代求解hessian矩阵的逆$G_k$,其他步骤同牛顿法（或阻尼牛顿法）。</p>
+<h2 id="BFGS算法"><a href="#BFGS算法" class="headerlink" title="BFGS算法"></a>BFGS算法</h2><p>BFGS算法核心思想是通过迭代对hessian矩阵进行近似（和DFP算法不同之处在于，DFP算法是对hessian矩阵的逆进行近似）。相对于DFP算法，BFGS算法性能更佳，具有完善的局部收敛理论，在全局收敛性研究也取得重要进展[4]。</p>
+<p>BFGS算法和DFP算法推导类似，迭代公式：<br>$H_{k+1}=H_k + \bigtriangleup H_k, \; k = 0, 1, 2, … \;(15)$</p>
+<p>其中H_0可以用单位矩阵进行构造，对于$\bigtriangleup H_k$的构造如下：</p>
+<p>$\bigtriangleup H_k= \alpha uu^T + \beta vv^T\;(16)$</p>
+<p>将式15和式16代入式9，得：</p>
+<p>$y_k \approx H_{k+1}s_k $</p>
+<p>$=&gt; y_k= H_ks_k+\alpha u^Ts_ku + \beta v^Ts_kv$</p>
+<p>$=&gt;y_k-H_ks_k=\alpha u^Ts_ku + \beta v^Ts_kv\;(17)$</p>
+<p>为使式17成立，直接令$u=y_k$, $v=H_ks_k, \alpha u^Ts_k=1, \beta v^Ts_k=-1$,  将$\alpha,\beta,u,v$代入式15，得：</p>
+<p>$\bigtriangleup H_k=\frac{y_ky_k^T}{y_k^Ts_k}-\frac{H_ks_ks_k^TH_k^T}{s_k^TH_ks_k}\;(18)$</p>
+<p>BFGS算法通过式18更新hessian矩阵的求解过程，在求解搜索方向$d_k=H_k^{-1}g_k$时，通过求解线性方程组$H_kd_k=g_k$得到$d_k$的值。</p>
+<p>更一般的解法是通过sherman-morrison公式[6],直接得到$H_{k+1}^{-1}$和$H_k^{-1}$之间的关系如式19所示，并根据该关系迭代求解hessian矩阵的逆:<br>$H_{k+1}^{-1}=(I-\frac{s_ky_k^T}{y_k^Ts_k})H_k^{-1}(I-\frac{y_ks_k^T}{y_k^Ts_k})+\frac{s_ks_k^T}{y_k^Ts_k}\;($</p>
+<p>$=&gt; G_{k+1}=(I-\frac{s_ky_k^T}{y_k^Ts_k})G_k(I-\frac{y_ks_k^T}{y_k^Ts_k})+\frac{s_ks_k^T}{y_k^Ts_k}\;(19)$</p>
+<h1 id="LBFGS算法"><a href="#LBFGS算法" class="headerlink" title="LBFGS算法"></a>LBFGS算法</h1><p>BFGS算法需要存储完整的$H_k^{-1}$矩阵。因此，当矩阵的维度比较大时，需要占用大量的存储空间(空间复杂度为$O(N^2)$)。LBFGS算法通过使用最近$m$次迭代过程中的$s$和$y$向量，使得其存储复杂度由$O(N^2)$下降到$O(m\times N)$[2]。</p>
+<p>本章节首先介绍lbfgs算法和求解推导、然后介绍带有L1正则的LBFGS算法求解（OWLQN算法）、最后介绍lbfgs算法在liblbfgs库[1]中的实现。</p>
+<h2 id="LBFGS算法及求解"><a href="#LBFGS算法及求解" class="headerlink" title="LBFGS算法及求解"></a>LBFGS算法及求解</h2><p>对于式19，我们令$\rho_k=\frac{1}{y_k^Ts_k}$, $v_k=(I-\rho_ky_ks_k^T)$, 得：</p>
+<p>$G_{k+1}=v_k^TG_kv_k+\rho_ks_ks_k^T\;(20)$</p>
+<p>假定$G_0$是正定矩阵，则：</p>
+<p>$G_1=v_0^TG_0v_0+\rho_0s_0s_0^T$</p>
+<p>$G_2=v_1^TG_1v_1+\rho_1s_1s_1^T=v_1^Tv_0^TG_0v_0v_1+v_1^T\rho_0s_0s_0^Tv_1+\rho_1s_1s_1^T$</p>
+<p>$G_3=v_2^Tv_1^TG_2v_1v_2+\rho_2s_2s_2^T=v_2^Tv_1^Tv_0^TG_0v_0v_1v_2+v_2^Tv_1^T\rho_0s_0s_0^Tv_1v_2+v_2^T\rho_1s_1s_1^Tv_2+\rho_2s_2s_2^T$</p>
+<p>通过递归式20，可得：</p>
+<p>$G_{k+1}=v_k^Tv_{k-1}^T…v_0^TG_0v_0…v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^Tv_{k-1}^T…v_1^T\rho_0 s_0 s_0^Tv_1…v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ …$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^Tv_{k-1}^T\rho_{k-2} s_{k-2} s_{k-2}v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^T\rho_{k-1} s_{k-1} s_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + \rho_ks_ks_k^T\;(21)$</p>
+<p>由式21可以得出，$G_{k+1}$的计算需要用到$G_0$,$s_i$, $y_i$,其中$i=0,1,2,…k$。而lbfgs算法最关键的点在于，通过使用距离当前迭代最近的$m$个$s$向量和$y$向量，近似求解$G_{k+1}$。当$k+1&lt;=m$,则根据式21直接求解$G_{k+1}$, 当$k+1&gt;m$时，只保留最近的$k$个$s$向量和$y$向量,具体计算如式22所示:</p>
+<p>$G_{k+1}=v_k^Tv_{k-1}^T…v_{k-m+1}^TG_0v_{k-m+1}…v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^Tv_{k-1}^T…v_{k-m+2}^T\rho_{k-m+1} s_{k-m+1} s_{k-m+1}^Tv_{k-m+2}…v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ …$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^Tv_{k-1}^T\rho_{k-2} s_{k-2} s_{k-2}v_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + v_k^T\rho_{k-1} s_{k-1} s_{k-1}v_k$</p>
+<p>$\ \ \ \ \ \ \ \ \ \ \ \ + \rho_ks_ks_k^T\;(22)$</p>
+<p>虽然式21和式22可用于在任何情况下，对hessian矩阵的逆进行迭代求近似解，进而用于lbfgs算法求解。然而，仅仅通过式21和式22，依然需要存储hessian矩阵的逆，并不能节省存储空间。实际上，我们只要能求出$G_kg_k$(或$H_k^{-1}g_k$)，就可以避开存储完整的$G_{k+1}$,将存储空间由$O(N^2)$下降至$O(m\times N)$。[2]提供了有效计算$G_kg_k$的一个迭代算法，如下所示：</p>
+<p><strong>算法1:</strong></p>
+<p>1） $if\;iter &lt; M: incr = 0, bound= iter$</p>
+<p>$\;\;\;\; else \; incr= iter - m, bound = m$</p>
+<p>2) $q_{bound} = g_{iter}$</p>
+<p>3) $for \;i = (bound-1), … , 0$</p>
+<p>$\;\;\;\;\;\;\;\;j = i + incr$</p>
+<p>$\;\;\;\;\;\;\;\;\alpha_i = \rho_js_j^Tq_{i+1} (存储每个\alpha_i)$</p>
+<p>$\;\;\;\;\;\;\;\;q_i=q_{i+1}-\alpha_iy_j$</p>
+<p>$\;\;\;\;r_0=G_0.q_0$</p>
+<p>$\;\;\;\;for\;i=0, 1, …, (bound - 1)$</p>
+<p>$\;\;\;\;\;\;\;\;j=i+incr$</p>
+<p>$\;\;\;\;\;\;\;\;\beta_i = \rho_jy_j^Tr_i$</p>
+<p>$\;\;\;\;\;\;\;\;r_{i+1}=r_i+s_j(\alpha_i-\beta_i)$</p>
+<p><strong>算法1的证明：</strong></p>
+<p>$q_{bound}=g_{iter}$</p>
+<p>对于$0&lt;i&lt;bound$,</p>
+<p>$q_i=q_{i+1}-\alpha_iy_i \ $</p>
+<p>$=q_{i+1}-\rho_jy_js_j^Tq_{i+1}$</p>
+<p>$=(I-\rho_jy_js_j^T)q_{i+1}$</p>
+<p>$=v_j^Tq_{i+1}$</p>
+<p>$=v_{inc+i}^Tq_{i+1}$</p>
+<p>$=v_{inc+i}v_{inc+i+1}q_{i+2}$</p>
+<p>$=v_{inc+i}v_{inc+i+1}v_{inc+i+2}…v_{inc+bound-1}q_{bound}\;(23)$</p>
+<p>$\alpha_i=\rho_js_j^Tq_{i+1}$</p>
+<p>$=\rho_{inc+i}s_{inc+i}^Tv_{inc+i+1}v_{inc+i+2}…v_{inc+bound-1}q_{bound}\;(24)$</p>
+<p>$r_0=G_0q_0=G_0v_{inc}v_{inc+1}…v_{inc+bound-1}q_{bound}(25)$</p>
+<p>$r_{i+1}=r_i+s_j(\alpha_i-\beta_i)$</p>
+<p>$=r_i+s_j\alpha_j-s_j\rho_jy_j^Tr_i=(I-s_j\rho_jy_j^T)r_i+s_j\alpha_i=v_{inc+i}^Tr_i+s_{inc+i}\alpha_i(26)$</p>
+<p>由式26可得：<br>$r_{bound}=s_{inc+bound-1}\alpha_{bound-1}+v_{inc+bound-1}r_{bound-1}$</p>
+<p>$=s_{inc+bound-1}\rho_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}+v_{inc+bound-1}r_{bound-1}$</p>
+<p>$=s_{inc+bound-1}\rho_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^T(s_{inc+bound-2}\alpha_{bound-2}+v_{inc+bound-2}^Tr_{bound-2})$</p>
+<p>$=\rho_{inc+bound-1}s_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^T\rho_{inc+bound-2}s_{inc+bound-2}s_{inc+bound-2}^Tv_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^Tr_{round-2}$</p>
+<p>$=\rho_{inc+bound-1}s_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^T\rho_{inc+bound-2}s_{inc+bound-2}s_{inc+bound-2}^Tv_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\rho_{inc+bound-3}s_{inc+bound-3}s_{inc+bound-3}^Tv_{inc+bound-2}v_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^Tv_{inc+bound-3}^Tr_{bound-3}$</p>
+<p>$=\rho_{inc+bound-1}s_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^T\rho_{inc+bound-2}s_{inc+bound-2}s_{inc+bound-2}^Tv_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\rho_{inc+bound-3}s_{inc+bound-3}s_{inc+bound-3}^Tv_{inc+bound-2}v_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;…$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\;…\;v_{inc+1}^T\rho_{inc}s_{inc}s_{inc}^Tv_{inc+1}\;…\;v_{inc+bound-2}v_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\;…\;v_{inc+1}^Tv_{inc}^Tr_0$</p>
+<p>$=\rho_{inc+bound-1}s_{inc+bound-1}s_{inc+bound-1}^Tq_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^T\rho_{inc+bound-2}s_{inc+bound-2}s_{inc+bound-2}^Tv_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\rho_{inc+bound-3}s_{inc+bound-3}s_{inc+bound-3}^Tv_{inc+bound-2}v_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;…$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\;…\;v_{inc+1}^T\rho_{inc}s_{inc}s_{inc}^Tv_{inc+1}\;…\;v_{inc+bound-2}v_{inc+bound-1}q_{bound}$</p>
+<p>$\;\;\;+v_{inc+bound-1}^Tv_{inc+bound-2}^T\;…\;v_{inc+1}^Tv_{inc}^TG_0v_{inc}v_{inc+1}…v_{inc+bound-1}q_{bound}$</p>
+<p>$=G_{iter}g_{iter}$</p>
+<p>到此，lbfgs迭代求解证明完毕，其中[1]中实现的lbfgs求解，就是用的该迭代算法。</p>
+<h2 id="OWL-QN算法及求解"><a href="#OWL-QN算法及求解" class="headerlink" title="OWL-QN算法及求解"></a>OWL-QN算法及求解</h2><p>为了减少模型过拟合，我们在进行优化求解时，通常的方式是加入正则项。常见的正则因子包括$l1$正则和$l2$正则。相对于$l2$正则，$l1$正则的优势在于[3]:(1)当大多数特征之间不相关时，$l1$正则在理论和实践上都能够学习更好的模型;(2)$l1$正则能够学到更稀疏的参数空间，有更好的可解释型，在模型计算时能更高效的进行计算。</p>
+<p>由于$l1$正则的一阶导数是常数，迭代时使得每个变量尽量被更新为0（$l2$正则是一个比例值，使得每个变量逐渐接近0而不是直接更行为0）。由于$l1$正则在零点不可导，使得基于梯度的优化算法如lbfgs算法无法使用。 针对该问题，Galen Andrew等人提出了OWL-QN(Orthant-Wise Limited-memory Quasi-Newton)算法，用于求解带$l1$正则的log-linear model。</p>
+<h3 id="相关定义"><a href="#相关定义" class="headerlink" title="相关定义"></a>相关定义</h3><p>为方便描述OWL-QN算法，我们做如下一些定义：</p>
+<p>$f(x)$对$x_i$的右导数：$\partial_i^+=lim_{\alpha-&gt;0}\frac{f(x+\alpha e_i)-f(x)}{\alpha}$</p>
+<p>$f(x)$对$x_i$的左导数：$\partial_i^-=lim_{\alpha-&gt;0}\frac{f(x)-f(x+\alpha e_i)}{\alpha}$</p>
+<p>其中$e_i$是第$i$个维度的基向量。</p>
+<p>$f(x)$对方向$d$的偏导数：$f′(x;d)=lim_{\alpha-&gt;0}\frac{f(x+\alpha d)-f(x)}{\alpha}$</p>
+<p>符号函数:$\sigma(x_i) =  \begin{cases}<br>1,  &amp; x_i&gt;0\\<br>-1,  &amp; x_i&lt;0\\<br>0,  &amp; x_i=0<br>\end{cases}<br>$</p>
+<p>象限投影函数:$\pi(x_i,y_i) =  \begin{cases}<br>x_i,  &amp; \sigma(x_i) = \sigma(y_i)\\<br>0,  &amp; otherwise<br>\end{cases}<br>$</p>
+<h3 id="OWL-QN算法"><a href="#OWL-QN算法" class="headerlink" title="OWL-QN算法"></a>OWL-QN算法</h3><p><strong>基于象限建模</strong></p>
+<p>考虑L1正则，要求解的目标函数为：</p>
+<p>$F(x)=f(x)+C ||x||_{1}\;(27)$</p>
+<p>其中$f(x)$为原始损失，$C ||x||_{1}$为正则惩罚。</p>
+<p>对于包含$L1$正则目标函数，当数据点集合在某个特定的象限内部（所有维度的符号保持不变），它是可导的。$L1$正则部分是参数的线性函数，且目标函数的二阶导数只取决于原始损失(不包括正则)的部分。基于这点，对于目标函数，可构建包括当前点的某个象限二阶泰勒展开（固定该象限时梯度可以求解，hessian矩阵只根据原始损失部分求解即可），并限制搜索的点，使得迭代后参数对应象限对于当前的近似依然是合法的。</p>
+<p>对于向量$\varepsilon \in \lbrace -1, 0 , 1 \rbrace ^n$, 我们定义其对应象限区域为：</p>
+<p>$\Omega_\varepsilon=\lbrace x \in R^n: \pi(x;\varepsilon)=x\rbrace$</p>
+<p>对于该象限内的任意点$x$，$F(x)=f(x)+C \varepsilon^Tx\;(28)$</p>
+<p>我们在式28基础上，扩展定义$F_\varepsilon$为定义在$R^n$上函数，在每个象限具有和$R_\varepsilon$空间类似的导数。通过损失函数的hessian矩阵的逆$H_k$，以及$F_\varepsilon$的负梯度在$\Omega_\varepsilon$的投影$v^k$，可以近似$F_\varepsilon$在$\Omega_\varepsilon$的投影。为迭代求$F_\varepsilon$最小值，出于技术原因，限制搜索的方向和$v^k$所在象限一致。</p>
+<p>$p^k=\pi(H_kv^k;v^k)$</p>
+<p><strong>选择投影象限：</strong></p>
+<p>为了选择投影的象限，我们定义伪梯度：</p>
+<p>$\diamond_iF(x)=\begin{cases}<br>\partial_i^{-}F(x),  &amp; if\;\partial_i^{-}F(x)&gt;0\\<br>\partial_i^{+}F(x),  &amp; if\;\partial_i^{+}F(x)&lt;0\\<br>0,  &amp; otherwise<br>\end{cases}\;(29)<br>$</p>
+<p>其中，$\partial_i^{+/-}F(x)$定义如下：<br>$\partial_i^{+/-}F(x)=\frac{\partial}{\partial x_i} f(x)+\begin{cases}<br>C \sigma(x_i) &amp; if\;x_i\neq 0\\<br>+/-C &amp; if\;x_i=0<br>\end{cases}\;(30)$</p>
+<p>由式30可得，$\partial_i^{-}F(x)\leq \partial_i^{+}F(x)$，因此式29能够精确定义。伪梯度是对梯度信息的泛化，$x$是极小值的充要条件是$\diamond_iF(x)=0$</p>
+<p>一个合理的象限选择可以定义如下：</p>
+<p>$\varepsilon_i^k=\begin{cases}\sigma(x_i^k) &amp;if(x_i^k\neq0)\\<br>\sigma(-\diamond_iF(x)) &amp; if (x_i^k = 0)<br>\end{cases}\;(31)$</p>
+<p>这样选择象限的理由是：-$\diamond_iF(x)$和$F_\varepsilon$的负梯度在$\Omega_\varepsilon$的投影$v^k$相等。因此，在利用owl-qn算法求解时，并不需要显示的计算$\varepsilon_i$,直接计算$-\diamond_iF(x)$, 就等价于按照式31设置$\varepsilon$,并代入式28求解梯度的投影。</p>
+<p><strong>有约束的线性搜索</strong></p>
+<p>为了确保每次迭代没有离开合法的象限空间，owl-qns算法对搜索的点重新投影到象限$\Omega_\varepsilon$，对于符号发生变化的每个维度，均置为0.如式32所示。</p>
+<p>$x_{k+1}=\pi(x^k+\alpha p^k; \varepsilon^k)\;(32)$</p>
+<p>有很多的线性搜索方法，[3]采用的方法是：</p>
+<p><strong>算法1:有约束的线性搜索</strong></p>
+<p>(1) $设置\;\beta,\gamma \in (0,1)$</p>
+<p>(2) $for\;\;n = 0, 1, 2…$</p>
+<p>$\;\;\;\;\;\;\;\;\;\; \alpha=\beta^n$</p>
+<p>$\;\;\;\;\;\; \;\;\;\;if\;\;f(x^{k+1})\leq f(x^k)-\gamma v^T(x^{k+1}-x^k)$</p>
+<p>$\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;找到下个最优解 $</p>
+<p>$\;\;\;\;\;\; \;\;\;\;else\;\;continue$</p>
+<p><strong>owl-qn算法</strong></p>
+<p>owl-qn算法同普通的lbfgs算法基本相同，不同之处主要在于：（1）需要计算伪梯度；（2）搜索方向对$v^k$对应的象限做做投影；（3）搜索的点需要限制在上次迭代点对应的象限。（4）目标函数的非正则部分的梯度用于更新$y$向量集合,而不是用伪梯度去更新$y$向量集合。</p>
+<p><strong>算法2:owl-qn算法描述</strong></p>
+<p>$初始化x_0,s=\lbrace\rbrace,y=\lbrace\rbrace$</p>
+<p>$for\;\; k = 0 \;to \;MaxIters$</p>
+<p>$\;\;\;\;计算梯度v^k=-\diamond f(x^k)$</p>
+<p>$\;\;\;\;通过s,y向量集合,计算d^k=H_kv^k$</p>
+<p>$\;\;\;\;p^k=\pi(d^k;v^k)$</p>
+<p>$\;\;\;\;根据算法1求解x_{k+1}$</p>
+<p>$\;\;\;\;如果达到终止条件，则终止算法，否则更新s^k=x_{k+1}-x_{k},y_{k+1}=\triangledown f(x^{k+1})-\triangledown f(x^{k}) 向量集合$</p>
+<h2 id="LBFGS在liblbfgs开源库的实现"><a href="#LBFGS在liblbfgs开源库的实现" class="headerlink" title="LBFGS在liblbfgs开源库的实现"></a>LBFGS在liblbfgs开源库的实现</h2><p>本章节主要介绍LBFGS算法在liblbfgs开源库[1]的实现，[1]不仅实现了普通的lbfgs算法，也实现了上个章节介绍的owl-qn算法。</p>
+<p><strong>相关数据结构:</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义callback_data_t结构</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tag_callback_data</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> n;  <span class="comment">//变量个数</span></span><br><span class="line">    <span class="keyword">void</span> *instance; <span class="comment">//实例</span></span><br><span class="line">    <span class="keyword">lbfgs_evaluate_t</span> proc_evaluate; <span class="comment">//计算目标函数及梯度的回调函数</span></span><br><span class="line">    <span class="keyword">lbfgs_progress_t</span> proc_progress; <span class="comment">//接受优化过程进度的的回调函数</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tag_callback_data</span> <span class="title">callback_data_t</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//定义iteration_data_t，存储lbfgs迭代需要的s,y向量</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tag_iteration_data</span> &#123;</span></span><br><span class="line">    <span class="keyword">lbfgsfloatval_t</span> alpha;  <span class="comment">//算法1迭代需要的alpha变量</span></span><br><span class="line">    <span class="keyword">lbfgsfloatval_t</span> *s;     <span class="comment">//x(k+1) - x(k)</span></span><br><span class="line">    <span class="keyword">lbfgsfloatval_t</span> *y;     <span class="comment">//g(k+1) - g(k)</span></span><br><span class="line">    <span class="keyword">lbfgsfloatval_t</span> ys;     <span class="comment">//vecdot(y, s)</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">tag_iteration_data</span> <span class="title">iteration_data_t</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//定义lbfgs参数</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">lbfgs_parameter_t</span> _defparam = &#123;</span><br><span class="line">    <span class="number">6</span>, <span class="number">1e-5</span>, <span class="number">0</span>, <span class="number">1e-5</span>,</span><br><span class="line">    <span class="number">0</span>, LBFGS_LINESEARCH_DEFAULT, <span class="number">40</span>,</span><br><span class="line">    <span class="number">1e-20</span>, <span class="number">1e20</span>, <span class="number">1e-4</span>, <span class="number">0.9</span>, <span class="number">0.9</span>, <span class="number">1.0e-16</span>,</span><br><span class="line">    <span class="number">0.0</span>, <span class="number">0</span>, <span class="number">-1</span>,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p><strong>lbfgs算法:</strong><br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//lbfgs算法求解核心过程，为描述lbfgs算法核心流程，此处只保留主要代码</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">lbfgs</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">int</span> n, <span class="comment">//变量个数</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">lbfgsfloatval_t</span> *x, <span class="comment">//变量值</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">lbfgsfloatval_t</span> *ptr_fx, <span class="comment">// 函数值</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">lbfgs_evaluate_t</span> proc_evaluate, <span class="comment">//计算目标函数及梯度的回调函数</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">lbfgs_progress_t</span> proc_progress, <span class="comment">//接受优化过程进度的的回调函数</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">void</span> *instance, <span class="comment">//实例变量</span></span></span></span><br><span class="line"><span class="function"><span class="params">    <span class="keyword">lbfgs_parameter_t</span> *_param <span class="comment">//lbfgs优化永的的参数变量</span></span></span></span><br><span class="line"><span class="function"><span class="params">    )</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ... </span><br><span class="line">    <span class="comment">//构建callback_data_t</span></span><br><span class="line">    <span class="keyword">callback_data_t</span> cd;</span><br><span class="line">    cd.n = n; <span class="comment">//参数的维度</span></span><br><span class="line">    cd.instance = instance; <span class="comment">//实例变量</span></span><br><span class="line">    cd.proc_evaluate = proc_evaluate; <span class="comment">//计算目标函数及梯度的回调函数</span></span><br><span class="line">    cd.proc_progress = proc_progress; <span class="comment">//接受优化过程进度的的回调函数</span></span><br><span class="line">   ...</span><br><span class="line">    <span class="comment">/* Allocate working space. */</span></span><br><span class="line">    xp = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));<span class="comment">//上次迭代的变量值</span></span><br><span class="line">    g = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));<span class="comment">//本次迭代对应的梯度值</span></span><br><span class="line">    gp = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));<span class="comment">//上次迭代的梯度址</span></span><br><span class="line">    d = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));<span class="comment">//迭代方向变量</span></span><br><span class="line">    w = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));</span><br><span class="line">    <span class="comment">//对l1正则，分配OW-LQN算法伪梯度需要的存储空间 */</span></span><br><span class="line">    <span class="keyword">if</span> (param.orthantwise_c != <span class="number">0.</span>) &#123;</span><br><span class="line">        pg = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));</span><br><span class="line">        <span class="keyword">if</span> (pg == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            ret = LBFGSERR_OUTOFMEMORY;</span><br><span class="line">            <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;    </span><br><span class="line">    <span class="comment">//最近m次迭代相关向量的存储</span></span><br><span class="line">    lm = (<span class="keyword">iteration_data_t</span>*)vecalloc(m * <span class="keyword">sizeof</span>(<span class="keyword">iteration_data_t</span>));</span><br><span class="line">    <span class="keyword">if</span> (lm == <span class="literal">NULL</span>) &#123;</span><br><span class="line">        ret = LBFGSERR_OUTOFMEMORY;</span><br><span class="line">        <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">    &#125;    </span><br><span class="line">    <span class="comment">//最近m次迭代相关向量的初始化</span></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>;i &lt; m;++i) &#123;</span><br><span class="line">        it = &amp;lm[i];</span><br><span class="line">        it-&gt;alpha = <span class="number">0</span>;</span><br><span class="line">        it-&gt;ys = <span class="number">0</span>;</span><br><span class="line">        it-&gt;s = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));</span><br><span class="line">        it-&gt;y = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(n * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));</span><br><span class="line">        <span class="keyword">if</span> (it-&gt;s == <span class="literal">NULL</span> || it-&gt;y == <span class="literal">NULL</span>) &#123;</span><br><span class="line">            ret = LBFGSERR_OUTOFMEMORY;</span><br><span class="line">            <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//最近的m次迭代的目标函数值</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0</span> &lt; param.past) &#123;</span><br><span class="line">        pf = (<span class="keyword">lbfgsfloatval_t</span>*)vecalloc(param.past * <span class="keyword">sizeof</span>(<span class="keyword">lbfgsfloatval_t</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//计算目标函数的值和梯度</span></span><br><span class="line">    fx = cd.proc_evaluate(cd.instance, x, g, cd.n, <span class="number">0</span>);</span><br><span class="line">    <span class="comment">//如果有l1正则，计算带l1正则的目标函数值和伪梯度信息 </span></span><br><span class="line">    <span class="keyword">if</span> (<span class="number">0.</span> != param.orthantwise_c) &#123;</span><br><span class="line">        <span class="comment">//有l1正则，计算l1正则对应的norm</span></span><br><span class="line">        xnorm = owlqn_x1norm(x, param.orthantwise_start, param.orthantwise_end);</span><br><span class="line">        <span class="comment">//将l1z正则对应的值加入目标函数</span></span><br><span class="line">        fx += xnorm * param.orthantwise_c;</span><br><span class="line">        <span class="comment">//计算伪梯度信息</span></span><br><span class="line">        owlqn_pseudo_gradient(</span><br><span class="line">            pg, x, g, n,</span><br><span class="line">            param.orthantwise_c, param.orthantwise_start, param.orthantwise_end</span><br><span class="line">            );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//存储目标函数值到pf[0]</span></span><br><span class="line">    <span class="keyword">if</span> (pf != <span class="literal">NULL</span>) &#123;</span><br><span class="line">        pf[<span class="number">0</span>] = fx;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//存储迭代方向到d变量, 假定原始hessian矩阵G0为单位矩阵，G0 g = g</span></span><br><span class="line">    <span class="keyword">if</span> (param.orthantwise_c == <span class="number">0.</span>) &#123;</span><br><span class="line">        vecncpy(d, g, n);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        vecncpy(d, pg, n);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//通过比较g_norm / max(1, x_norm)是否小于param.epsilon，确定是否已经达到极小值</span></span><br><span class="line">    vec2norm(&amp;xnorm, x, n);</span><br><span class="line">    <span class="keyword">if</span> (param.orthantwise_c == <span class="number">0.</span>) &#123;</span><br><span class="line">        vec2norm(&amp;gnorm, g, n);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        vec2norm(&amp;gnorm, pg, n);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (xnorm &lt; <span class="number">1.0</span>) xnorm = <span class="number">1.0</span>;</span><br><span class="line">    <span class="keyword">if</span> (gnorm / xnorm &lt;= param.epsilon) &#123;</span><br><span class="line">        ret = LBFGS_ALREADY_MINIMIZED;</span><br><span class="line">        <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//初始化最优步长 step: 1.0 / sqrt(vecdot(d, d, n)) */</span></span><br><span class="line">    vec2norminv(&amp;step, d, n);</span><br><span class="line">    k = <span class="number">1</span>;</span><br><span class="line">    end = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        veccpy(xp, x, n);<span class="comment">//存储变量值到xp</span></span><br><span class="line">        veccpy(gp, g, n);<span class="comment">//存储梯度值到gp</span></span><br><span class="line">        <span class="comment">/* Search for an optimal step. */</span></span><br><span class="line">        <span class="keyword">if</span> (param.orthantwise_c == <span class="number">0.</span>) &#123;<span class="comment">//无l1正则，在d方向搜索最优解</span></span><br><span class="line">            ls = linesearch(n, x, &amp;fx, g, d, &amp;step, xp, gp, w, &amp;cd, &amp;param);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">//有l1正则，在d方向搜索最优解</span></span><br><span class="line">            ls = linesearch(n, x, &amp;fx, g, d, &amp;step, xp, pg, w, &amp;cd, &amp;param);</span><br><span class="line">            <span class="comment">//计算伪梯度</span></span><br><span class="line">            owlqn_pseudo_gradient(</span><br><span class="line">                pg, x, g, n,</span><br><span class="line">                param.orthantwise_c, param.orthantwise_start, param.orthantwise_end</span><br><span class="line">                );</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//达到终止条件</span></span><br><span class="line">        <span class="keyword">if</span> (ls &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="comment">/* Revert to the previous point. */</span></span><br><span class="line">            veccpy(x, xp, n);</span><br><span class="line">            veccpy(g, gp, n);</span><br><span class="line">            ret = ls;</span><br><span class="line">            <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Compute x and g norms. */</span></span><br><span class="line">        <span class="comment">//计算x范数，g范数</span></span><br><span class="line">        vec2norm(&amp;xnorm, x, n);</span><br><span class="line">        <span class="keyword">if</span> (param.orthantwise_c == <span class="number">0.</span>) &#123;</span><br><span class="line">            vec2norm(&amp;gnorm, g, n);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            vec2norm(&amp;gnorm, pg, n);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//输出进度信息</span></span><br><span class="line">        <span class="keyword">if</span> (cd.proc_progress) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((ret = cd.proc_progress(cd.instance, x, g, fx, xnorm, gnorm, step, cd.n, k, ls))) &#123;</span><br><span class="line">                <span class="keyword">goto</span> lbfgs_exit;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//收敛测试， |g(x)| / \max(1, |x|) &lt; \epsil</span></span><br><span class="line">        <span class="keyword">if</span> (xnorm &lt; <span class="number">1.0</span>) xnorm = <span class="number">1.0</span>;</span><br><span class="line">        <span class="keyword">if</span> (gnorm / xnorm &lt;= param.epsilon) &#123;</span><br><span class="line">            ret = LBFGS_SUCCESS;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//以past为周期，根据当前函数值和1个周期之前的函数值判断是否停止迭代</span></span><br><span class="line">        <span class="comment">//停止条件：(f(past_x) - f(x)) / f(x) &lt; \delta</span></span><br><span class="line">        <span class="keyword">if</span> (pf != <span class="literal">NULL</span>) &#123;</span><br><span class="line">            <span class="comment">/* We don't test the stopping criterion while k &lt; past. */</span></span><br><span class="line">            <span class="keyword">if</span> (param.past &lt;= k) &#123;</span><br><span class="line">                <span class="comment">/* Compute the relative improvement from the past. */</span></span><br><span class="line">                rate = (pf[k % param.past] - fx) / fx;</span><br><span class="line">                <span class="comment">/* The stopping criterion. */</span></span><br><span class="line">                <span class="keyword">if</span> (rate &lt; param.delta) &#123;</span><br><span class="line">                    ret = LBFGS_STOP;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">/* Store the current value of the objective function. */</span></span><br><span class="line">            pf[k % param.past] = fx;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//达到最大迭代次数</span></span><br><span class="line">        <span class="keyword">if</span> (param.max_iterations != <span class="number">0</span> &amp;&amp; param.max_iterations &lt; k+<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">/* Maximum number of iterations. */</span></span><br><span class="line">            ret = LBFGSERR_MAXIMUMITERATION;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//更新向量s, y  s_&#123;k+1&#125; = x_&#123;k+1&#125; - x_&#123;k&#125;，y_&#123;k+1&#125; = g_&#123;k+1&#125; - g_&#123;k&#125;</span></span><br><span class="line">        it = &amp;lm[end];</span><br><span class="line">        vecdiff(it-&gt;s, x, xp, n);</span><br><span class="line">        vecdiff(it-&gt;y, g, gp, n);</span><br><span class="line"></span><br><span class="line">        vecdot(&amp;ys, it-&gt;y, it-&gt;s, n); <span class="comment">//ys = y^t \cdot s; 1 / \rho</span></span><br><span class="line">        vecdot(&amp;yy, it-&gt;y, it-&gt;y, n); <span class="comment">//yy = y^t \cdot y</span></span><br><span class="line">        it-&gt;ys = ys;<span class="comment">// y^t \cdot s</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">           Recursive formula to compute dir = -(H \cdot g).</span></span><br><span class="line"><span class="comment">               This is described in page 779 of:</span></span><br><span class="line"><span class="comment">               Jorge Nocedal.</span></span><br><span class="line"><span class="comment">               Updating Quasi-Newton Matrices with Limited Storage.</span></span><br><span class="line"><span class="comment">               Mathematics of Computation, Vol. 35, No. 151,</span></span><br><span class="line"><span class="comment">               pp. 773--782, 1980.</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">        <span class="comment">//根据文献[1]中算法（对应本文算法1），计算 -(G \cdot g)</span></span><br><span class="line">        bound = (m &lt;= k) ? m : k;</span><br><span class="line">        ++k;</span><br><span class="line">        end = (end + <span class="number">1</span>) % m;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* Compute the steepest direction. */</span></span><br><span class="line">        <span class="keyword">if</span> (param.orthantwise_c == <span class="number">0.</span>) &#123;</span><br><span class="line">            <span class="comment">/* Compute the negative of gradients. */</span></span><br><span class="line">            vecncpy(d, g, n);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            vecncpy(d, pg, n);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        j = end;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>;i &lt; bound;++i) &#123;</span><br><span class="line">            j = (j + m - <span class="number">1</span>) % m;    <span class="comment">/* if (--j == -1) j = m-1; */</span></span><br><span class="line">            it = &amp;lm[j];</span><br><span class="line">            <span class="comment">/* \alpha_&#123;j&#125; = \rho_&#123;j&#125; s^&#123;t&#125;_&#123;j&#125; \cdot q_&#123;k+1&#125;. */</span></span><br><span class="line">            vecdot(&amp;it-&gt;alpha, it-&gt;s, d, n);</span><br><span class="line">            it-&gt;alpha /= it-&gt;ys;</span><br><span class="line">            <span class="comment">/* q_&#123;i&#125; = q_&#123;i+1&#125; - \alpha_&#123;i&#125; y_&#123;i&#125;. */</span></span><br><span class="line">            vecadd(d, it-&gt;y, -it-&gt;alpha, n);</span><br><span class="line">        &#125;</span><br><span class="line">        vecscale(d, ys / yy, n);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">0</span>;i &lt; bound;++i) &#123;</span><br><span class="line">            it = &amp;lm[j];</span><br><span class="line">            <span class="comment">/* \beta_&#123;j&#125; = \rho_&#123;j&#125; y^t_&#123;j&#125; \cdot \gamma_&#123;i&#125;. */</span></span><br><span class="line">            vecdot(&amp;beta, it-&gt;y, d, n);</span><br><span class="line">            beta /= it-&gt;ys;</span><br><span class="line">            <span class="comment">/* \gamma_&#123;i+1&#125; = \gamma_&#123;i&#125; + (\alpha_&#123;j&#125; - \beta_&#123;j&#125;) s_&#123;j&#125;. */</span></span><br><span class="line">            vecadd(d, it-&gt;s, it-&gt;alpha - beta, n);</span><br><span class="line">            j = (j + <span class="number">1</span>) % m;        <span class="comment">/* if (++j == m) j = 0; */</span></span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1] chokkan, <a href="https://github.com/chokkan/liblbfgs" target="_blank" rel="noopener">https://github.com/chokkan/liblbfgs</a></p>
+<p>[2] Jorge Nocedal, Updating Quasi-Newton Matrices With Limited Storage</p>
+<p>[3] Galen Andrew, Jianfeng Gao, Scalable Training of L1-Regularized Log-Linear Models</p>
+<p>[4] 皮果提, <a href="http://blog.csdn.net/itplus/article/details/21896453" target="_blank" rel="noopener">http://blog.csdn.net/itplus/article/details/21896453</a></p>
+<p>[5] <a href="http://blog.sina.com.cn/s/blog_eb3aea990101gflj.html" target="_blank" rel="noopener">http://blog.sina.com.cn/s/blog_eb3aea990101gflj.html</a></p>
+<p>[6] <a href="https://en.wikipedia.org/wiki/Sherman%E2%80%93Morrison_formula" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Sherman%E2%80%93Morrison_formula</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/lbfgs/" rel="tag">#lbfgs</a>
+          
+            <a href="/tags/拟牛顿算法/" rel="tag">#拟牛顿算法</a>
+          
+            <a href="/tags/非线性优化/" rel="tag">#非线性优化</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/03/mf/" rel="next" title="矩阵分解模型的分布式求解">
+                <i class="fa fa-chevron-left"></i> 矩阵分解模型的分布式求解
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/08/user_profile/" rel="prev" title="用户画像学习与总结">
+                用户画像学习与总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#牛顿法"><span class="nav-number">1.</span> <span class="nav-text">牛顿法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#拟牛顿法"><span class="nav-number">2.</span> <span class="nav-text">拟牛顿法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#拟牛顿条件"><span class="nav-number">2.1.</span> <span class="nav-text">拟牛顿条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DFP算法"><span class="nav-number">2.2.</span> <span class="nav-text">DFP算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BFGS算法"><span class="nav-number">2.3.</span> <span class="nav-text">BFGS算法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#LBFGS算法"><span class="nav-number">3.</span> <span class="nav-text">LBFGS算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LBFGS算法及求解"><span class="nav-number">3.1.</span> <span class="nav-text">LBFGS算法及求解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#OWL-QN算法及求解"><span class="nav-number">3.2.</span> <span class="nav-text">OWL-QN算法及求解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#相关定义"><span class="nav-number">3.2.1.</span> <span class="nav-text">相关定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OWL-QN算法"><span class="nav-number">3.2.2.</span> <span class="nav-text">OWL-QN算法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LBFGS在liblbfgs开源库的实现"><span class="nav-number">3.3.</span> <span class="nav-text">LBFGS在liblbfgs开源库的实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

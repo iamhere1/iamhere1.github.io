@@ -1,0 +1,770 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="推荐算法,基于性别的推荐," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="一种基于性别的推荐方法">
+<meta name="keywords" content="推荐算法,基于性别的推荐">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一种基于性别的推荐方法">
+<meta property="og:url" content="http://learning.github.com/2017/03/16/gender_based_rs/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="一种基于性别的推荐方法">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-11T09:58:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一种基于性别的推荐方法">
+<meta name="twitter:description" content="一种基于性别的推荐方法">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 一种基于性别的推荐方法 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                一种基于性别的推荐方法
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-03-16T00:00:00+08:00" content="2017-03-16">
+              2017-03-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/推荐系统/" itemprop="url" rel="index">
+                    <span itemprop="name">推荐系统</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/03/16/gender_based_rs/" class="leancloud_visitors" data-flag-title="一种基于性别的推荐方法">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+<h1 id="基于性别的推荐"><a href="#基于性别的推荐" class="headerlink" title="基于性别的推荐"></a>基于性别的推荐</h1><p><strong>基于内容的推荐</strong>:基于协同过滤掉方法，存在非常明显的缺点：无法解决冷启动问题（包括user冷启动和item冷启动），当用户没有行为时无法进行推荐，或者行为非常稀疏的时候，虽然可以产生推荐列表，但会存在过度泛化问题【1】。相对于协同过滤，基于内容的推荐的方法, 能够较好地应对冷启动问题。通过提取user和item相关内容信息，并根据所提取的信息进行推荐。但是，user和item的内容信息的提取往往需要比较专业的知识，其提取过程需要耗费较大的精力。</p>
+<p><strong>基于性别的推荐</strong>: 基于性别进行推荐属于一种基于内容的推荐方法，通过利用user性别信息、item的性别偏好信息进行推荐。该方法的优点是简单、可以在用户没有任何行为时推荐该性别的用户普遍感兴趣的内容；同时缺点也比较明显：同一性别的用户，其兴趣也可会有较大不同，因此该方法无法做到千人千面。</p>
+<h1 id="推荐方案设计"><a href="#推荐方案设计" class="headerlink" title="推荐方案设计"></a>推荐方案设计</h1><p>   整个推荐方案包括三个步骤：user性别信息获取、item性别偏好计算、基于性别的item推荐。</p>
+<h2 id="user性别信息获取"><a href="#user性别信息获取" class="headerlink" title="user性别信息获取"></a>user性别信息获取</h2><p> 用户性别信息主要来自用户注册信息。由于用户注册时，性别可能会填写错误，或者不填写，此时可通过其它方式多用户的性别进行校准和填充。如根据大多数用户的信息，计算item的性别偏好信息。根据该用户在各个item上的行为表现，计算该用户的性别画像。</p>
+<h2 id="item性别偏好计算"><a href="#item性别偏好计算" class="headerlink" title="item性别偏好计算"></a>item性别偏好计算</h2><p><strong>属性计算</strong></p>
+<p>基于有性别信息的用户，对item的消费行为，计算item的性别偏好。</p>
+<p>  $P(C|I_j)=\frac{\sum_iR_{ij}U_i(C)}{\sum_iR_{ij}}（式1）$</p>
+<p>其中$P(C|I_j)$表示第j个item对应属性C的偏好得分。</p>
+<p>$U_i(C)$表示第i个用户对应属性C的概率值，可以根据用户注册信息、用户行为信息挖掘等方式得到。</p>
+<p>$R_{ij}$表示第i个用户对第j个item的喜欢程度，可对用户在item上的各种行（如点击、点赞、评论、发图、收藏等）分别赋予不同的权值，然后根据用户的行为类型、行为频次等进行加权得到。</p>
+<p><strong>属性平滑</strong></p>
+<p>当平台上用户的数量和活跃度比较接近时，直接使用公式1是没有问题的。但是当不同性别的用户数量相差较大时，根据公式1计算出的item偏好会明显倾向于数量较多的那个性别。例如，平台上的男性用户数量：女性用户数量=5:1， 我们只考虑点击行为，当某个item男女点击比例为5:1时，我们并不能认为该item更容易被男性用户喜欢，而是认为该item对男女的吸引程度相同；男女点击比例为1:1时，该item对女性的吸引程度是更大的。</p>
+<p>因此，需要对item的性别偏好进行平滑,方法如下：</p>
+<ul>
+<li><p>平滑系数计算</p>
+<p>$SMOOTH(C)=\frac{\sum_i\sum_jR_{ij}U_i(C)}{\sum_i\sum_{j}R_{ij}}（式2)$</p>
+</li>
+<li><p>对公式1进行平滑</p>
+<p>$P_{smooth}(C|I_j)=\frac{P(C|I_j)}{SMOOTH(C)}（式3)$</p>
+</li>
+</ul>
+<p><strong>加入其它因素</strong></p>
+<p>  通过公式3得到的属性计算结果修正了平台不同属性用户数量不同带来的干扰，但是依然有些可以改进的地方。比如对于两个不同的item, 其男女偏好得分是非常接近，同样只考虑点击行为。其中一个item A被用户点击的次数为10万、点击的用户数8万等明显多于item B（点击次数100， 点击人数50）, 那么我们可以认为item A的得分是更加可靠的。因此，可考虑加入点击次数等相关因素。</p>
+<p>  $P(other|I_j) = \frac{\sum_iR_{ij}}{\sum_i\sum_jR_{ij}} (式4)$</p>
+<p>  由于我们的目的主要是找出对每个性别更感兴趣的item, 因此，当$P_{smooth}(C|I_j)$大于0.5时，利用如下公式进一步调整分数。</p>
+<p>  $P_{opt}(C|I_j)=\alpha P_{smooth}(C|I_j) + (1-\alpha)P(other|I_j) （式5)$  </p>
+<p>  通过公式5，综合考虑了属性偏好及热度因素。对分数差别较小的item，如果都是偏向于属性C（$P_{smooth}(C|I_j)$大于0.5），可以根据热度等相关因素进行排序;而对于分数差别比较大的item, 则依然可以维持原来的偏好进行顺序。</p>
+<p><strong>归一化</strong></p>
+<p>  对上述计算结果进行归一化，如下所示：</p>
+<p>  $P_{norm}(C|I_j)=\frac{P_{opt}(C|I_j)}{\sum_CP_{opt}(C|I_j)} （式6)$</p>
+<h2 id="基于性别的item推荐"><a href="#基于性别的item推荐" class="headerlink" title="基于性别的item推荐"></a>基于性别的item推荐</h2><p>完成计算item的性别偏好信息之后，可进一步用于解决推荐时遇到的用户冷启动问题。具体方法如下：</p>
+<ul>
+<li><p>在线用户筛选及性别获取</p>
+<p>当用户到来时，如果用户具有较多行为，可根据协同过滤相关方法进行推荐（如als）。否则获取用户注册的性别，或者通过其它方式矫正和填充后的性别信息。</p>
+</li>
+<li><p>基于性别信息获取推荐结果</p>
+<p>根据性别信息，选择相关性别偏好得分最高的k个item进行推荐。为实现推荐的多样性，提升用户体验，可以对item进行一定的分类，对于每个类别，分别取前top k个item构成多个队列，每次用户请求时，根据业务需求从每个队列中尽量均匀地选取item进行推荐。</p>
+</li>
+</ul>
+<h1 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h1><ul>
+<li><p>离线实验</p>
+<p>  对in平台图片进行实验，男女的性别偏好有着较大的区别。实验结果显示，男性最喜欢的图片的是汽车、美女、运动、建筑等，而女性则更喜欢美妆、动漫、美食、宠物等类别的图片。</p>
+</li>
+<li><p>在线实验</p>
+<p>  对于新增用户进行实验，分为实验组和对照组，实验组采用基于性别的推荐方案，对照组保持着之前的逻辑不变（基于热度的推荐）。分别评估实验组和对照组用户点击、平均下滑次数。实验结果显示，<strong>男性平均点击次数提升20.8%,平均下滑次数提升19%；女性平均点击次数提升1.1%，平均下滑次数提升1.4%。</strong>女性用户效果提升不明显，其主要原因在于in平台的主要用户是女性，根据热度进行排序基本反映了女性用户对图片的喜欢程度。对男性用户效果明显，主要原因是对照组根据热度推荐，更多推荐的是女性用户喜欢的图片，而实验组基于性别的推荐，则利用热度和性别偏好两方面信息，推荐了男性用户更喜欢的图片。</p>
+</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】HT Cheng, L Koc, J Harmsen, T Shaked, “Wide &amp; Deep Learning for Recommender Systems”, Proceedings of the 1st Workshop on Deep Learning for Recommender Systems, 2016.09, pp.7-10</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/推荐算法/" rel="tag">#推荐算法</a>
+          
+            <a href="/tags/基于性别的推荐/" rel="tag">#基于性别的推荐</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/02/22/als/" rel="next" title="ALS推荐算法学习与实践">
+                <i class="fa fa-chevron-left"></i> ALS推荐算法学习与实践
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/04/18/neuralnetwork/" rel="prev" title="神经网络与深度学习笔记">
+                神经网络与深度学习笔记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#基于性别的推荐"><span class="nav-number">1.</span> <span class="nav-text">基于性别的推荐</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#推荐方案设计"><span class="nav-number">2.</span> <span class="nav-text">推荐方案设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user性别信息获取"><span class="nav-number">2.1.</span> <span class="nav-text">user性别信息获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#item性别偏好计算"><span class="nav-number">2.2.</span> <span class="nav-text">item性别偏好计算</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基于性别的item推荐"><span class="nav-number">2.3.</span> <span class="nav-text">基于性别的item推荐</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实验"><span class="nav-number">3.</span> <span class="nav-text">实验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

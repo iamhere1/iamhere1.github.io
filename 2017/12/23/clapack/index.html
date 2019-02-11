@@ -1,0 +1,760 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="lapack,clapack,线性代数工具包," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="一个开源的线性代数工具包，可用于求解线性方程组、线性最小二乘、特征值和奇异值等相关问题">
+<meta name="keywords" content="lapack,clapack,线性代数工具包">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLAPACK学习">
+<meta property="og:url" content="http://learning.github.com/2017/12/23/clapack/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="一个开源的线性代数工具包，可用于求解线性方程组、线性最小二乘、特征值和奇异值等相关问题">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2018-02-11T09:58:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CLAPACK学习">
+<meta name="twitter:description" content="一个开源的线性代数工具包，可用于求解线性方程组、线性最小二乘、特征值和奇异值等相关问题">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> CLAPACK学习 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                CLAPACK学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-12-23T00:00:00+08:00" content="2017-12-23">
+              2017-12-23
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/工具学习/" itemprop="url" rel="index">
+                    <span itemprop="name">工具学习</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/12/23/clapack/" class="leancloud_visitors" data-flag-title="CLAPACK学习">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+<p><strong>LAPACK</strong>：全称Linear Algebra PACKage，美国国家科学基金等资助开发的著名公开软。以Fortran语言编写，提供了丰富函数，用于求解线性方程组、线性最小二乘、特征值和奇异值等相关问题。spark mllib, mxnet等都在底层使用了lapack进行相关的线性代数计算。</p>
+<p><strong>CLAPACK</strong>：使用f2c工具将LAPACK的Fortran代码转换成C语言代码的C语言算法包, 可用于在C语言环境中直接调用线性代数的相关函数功能。</p>
+<p>本文主要是描述如何在linux环境中安装clapack，以CLAPACK-3.2.1为例进行说明，并使用clapack实现cholesky分解过程。</p>
+<h1 id="clapack安装"><a href="#clapack安装" class="headerlink" title="clapack安装"></a>clapack安装</h1><h2 id="准备安装文件"><a href="#准备安装文件" class="headerlink" title="准备安装文件"></a>准备安装文件</h2><ul>
+<li>远程获取文件：wget <a href="http://www.netlib.org/clapack/clapack.tgz" target="_blank" rel="noopener">http://www.netlib.org/clapack/clapack.tgz</a>  </li>
+<li>将clapack.tgz拷贝到准备安装的目录，运行tar -xvf clapack.tgz 完成解压。</li>
+<li>cd CLAPACK-3.2.1 进入CLAPACK主目录。</li>
+<li>cp make.inc.example make.inc </li>
+</ul>
+<p><strong>此时目录下的主要文件目录：</strong></p>
+<ul>
+<li>BLAS：blas C语言源码，clapack需要调用的该底层函数库。</li>
+<li>F2CLIBS：f2c相关函数库</li>
+<li>INCLUDE：clapack, blas, f2c库对应的头文件</li>
+<li>INSTALL：测试函数，对于不同的平台提前测试make.inc对应的配置</li>
+<li>Makefile：构建文件</li>
+<li>make.inc：定义compiler, compile flags and library。</li>
+<li>SRC：LAPACK c语言代码，当我们要查某个函数的具体参数时，可以到这个目录下根据函数的名字找到对应的.c文件</li>
+<li>TESTING：用于对clapack函数测试其正确性</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><ul>
+<li>编译f2c: make f2clib</li>
+<li>编译blas: make blaslib, 需要注意的是，这里是使用的该clapck包所引用的blas库，没有针对所有机器做优化。如果想针对自己的机器，使用对应的库使速度达到最优，可以参考BLAS/WRAP目录</li>
+<li>运行blas测试程序：<br>cd BLAS/TESTING &amp;&amp; make -f Makeblat2<br>cd ..<br>./xblat2s &lt; sblat2.in<br>./xblat2d &lt; dblat2.in<br>./xblat2c &lt; cblat2.in<br>./xblat2z &lt; zblat2.in<br>cd TESTING &amp;&amp; make -f Makeblat3<br>cd ..<br>  ./xblat3s &lt; sblat3.in<br>  ./xblat3d &lt; dblat3.in<br>  ./xblat3c &lt; cblat3.in<br>  ./xblat3z &lt; zblat3.in<br>cd ..</li>
+<li><p>修改make.inc:<br>CC        = gcc<br>BLASLIB      = ../../blas$(PLAT).a</p>
+</li>
+<li><p>编译clapack源码及相关测试：<br>cd INSTALL &amp;&amp; make &amp;&amp; cd ..<br>cd SRC/ &amp;&amp; make &amp;&amp; cd ..<br>cd TESTING/MATGEN &amp;&amp; make &amp;&amp; cd .. &amp;&amp; make<br>上述步骤都通过后，在主目录下生成blas_LINUX.a， lapack_LINUX.a二个库，其他程序调用时通过引用这两个库，调用clapack完成线性代数相关计算。  </p>
+</li>
+</ul>
+<h1 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h1><p>   为测试环境可正常使用，此处使用clapack，利用cholesky分解求解线性方程组。<br>   方程组如下：<br>   <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">A = “4.16   -3.12  0.56  -0.10</span><br><span class="line">     -3.12  5.03   -0.83 1.18</span><br><span class="line">     0.56   -0.83  0.76  0.34</span><br><span class="line">     -0.10  1.18   0.34  1.18”</span><br><span class="line">                       </span><br><span class="line">b = &quot;8.7</span><br><span class="line">     -13.35</span><br><span class="line">     1.89</span><br><span class="line">     -4.14&quot;</span><br><span class="line">求解 Ax = b方程组</span><br></pre></td></tr></table></figure></p>
+<p>   c++代码：<br>   <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"blaswrap.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"f2c.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"clapack.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">long</span> <span class="keyword">int</span> k = <span class="number">4</span>;</span><br><span class="line">  <span class="keyword">long</span> <span class="keyword">int</span> nrhs = <span class="number">1</span>;</span><br><span class="line">  <span class="keyword">long</span> <span class="keyword">int</span> ldb = k;</span><br><span class="line">  <span class="keyword">long</span> <span class="keyword">int</span> info = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">double</span> a[<span class="number">10</span>]=&#123;<span class="number">4.16</span>, <span class="number">-3.12</span>, <span class="number">5.03</span>, <span class="number">0.56</span>, <span class="number">-0.83</span>, <span class="number">0.76</span>, <span class="number">-0.10</span>, <span class="number">1.18</span>, <span class="number">0.34</span>, <span class="number">1.18</span>&#125;;</span><br><span class="line">  <span class="keyword">double</span> b[<span class="number">4</span>]=&#123;<span class="number">8.7</span>, <span class="number">-13.35</span>, <span class="number">1.89</span>, <span class="number">-4.14</span>&#125;;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">char</span> matrix_type=<span class="string">'U'</span>; </span><br><span class="line">  dppsv_(&amp;matrix_type, &amp;k, &amp;nrhs, a, b, &amp;k, &amp;info);</span><br><span class="line">  <span class="built_in">cout</span> &lt;&lt; <span class="string">"solution:"</span>;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt; k; i++)&#123;</span><br><span class="line">      <span class="built_in">cout</span> &lt;&lt; b[i] &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="built_in">cout</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">  <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>编译程序：</strong><br>在目录下新建文件夹example, mkdir example<br>保存文件main.cc<br>g++ -o main main.cc -I ../INCLUDE -L ../ -lblas -llapack<br>(-I和-L选项需要根据自己机器对应的头文件和库文件目录来写)</p>
+<p><strong>运行程序：</strong><br>./main</p>
+<p>输入如下： solution:1 -1 2 -3</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>【1】 lapack@cs.utk.edu, <a href="http://www.netlib.org/clapack/" target="_blank" rel="noopener">http://www.netlib.org/clapack/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/lapack/" rel="tag">#lapack</a>
+          
+            <a href="/tags/clapack/" rel="tag">#clapack</a>
+          
+            <a href="/tags/线性代数工具包/" rel="tag">#线性代数工具包</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/20/dnn_for_youtube_recommandation/" rel="next" title="Deep Neural Networks for YouTube Recommendations论文学习">
+                <i class="fa fa-chevron-left"></i> Deep Neural Networks for YouTube Recommendations论文学习
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/03/mf/" rel="prev" title="矩阵分解模型的分布式求解">
+                矩阵分解模型的分布式求解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#clapack安装"><span class="nav-number">1.</span> <span class="nav-text">clapack安装</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备安装文件"><span class="nav-number">1.1.</span> <span class="nav-text">准备安装文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#安装"><span class="nav-number">1.2.</span> <span class="nav-text">安装</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#测试"><span class="nav-number">2.</span> <span class="nav-text">测试</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

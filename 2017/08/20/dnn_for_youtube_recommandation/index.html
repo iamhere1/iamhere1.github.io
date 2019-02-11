@@ -1,0 +1,798 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="个性化推荐,深度学习,DNN," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="论文来自YouTube团队使用DNN进行推荐方面的尝试，发表在16年9月的RecSys会议">
+<meta name="keywords" content="个性化推荐,深度学习,DNN">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deep Neural Networks for YouTube Recommendations论文学习">
+<meta property="og:url" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="论文来自YouTube团队使用DNN进行推荐方面的尝试，发表在16年9月的RecSys会议">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_matching.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/example_age_efficacy.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_ranking.png">
+<meta property="og:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png">
+<meta property="og:updated_time" content="2018-02-11T09:58:53.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deep Neural Networks for YouTube Recommendations论文学习">
+<meta name="twitter:description" content="论文来自YouTube团队使用DNN进行推荐方面的尝试，发表在16年9月的RecSys会议">
+<meta name="twitter:image" content="http://learning.github.com/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> Deep Neural Networks for YouTube Recommendations论文学习 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Deep Neural Networks for YouTube Recommendations论文学习
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-08-20T00:00:00+08:00" content="2017-08-20">
+              2017-08-20
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/推荐系统/" itemprop="url" rel="index">
+                    <span itemprop="name">推荐系统</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/08/20/dnn_for_youtube_recommandation/" class="leancloud_visitors" data-flag-title="Deep Neural Networks for YouTube Recommendations论文学习">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+
+
+
+<p>YouTube采用的推荐系统，是当前工业界最大最复杂的推荐系统之一，服务于上十亿的用户，目的是从不断增加的的海量的视频集合中，为每个用户推荐个性化的内容。<br>YouTube的个性化推荐系统主要存在三方面的挑战：</p>
+<p><strong>数据规模:</strong> 由于YouTube庞大的数据规模，很多在小数据集上非常有效的推荐算法无法使用，需要更加特殊的分布式学习算法和在线推荐服务系统。</p>
+<p><strong>新颖度：</strong> 每一秒都有很多的视频上传到YouTube, 推荐系统需要及时考虑这些新上传的视频以及用户在视频上的新操作等，这就需要从 exploration/exploitation的角度去权衡。 </p>
+<p><strong>数据特点和噪声：</strong> 由于用户行为的稀疏性以及一些不确定的额外因素干扰，通过用户的历史行为进行推荐是非常困难的；在YouTube上很少能获得用户的显示喜欢的内容，因此只能根据隐式反馈信号进行建模；视频内容的元数据不够结构化；推荐算法的设计需要对所有这些数据特点都是鲁棒的。</p>
+<p>为了保持和google内其他产品的一致，YouTube内部正在做的一件事情是将深度学习作为一种通用的解决方案，用于解决几乎所有的机器学习问题。该论文成果建立在google brain开源的tensorflow之上。tensorflow提供了可以大规模训练各种网络结构的实验框架，本篇论文实验使用了几千亿的样本，训练十亿的参数。</p>
+<h1 id="系统概述"><a href="#系统概述" class="headerlink" title="系统概述"></a>系统概述</h1><p>如图1[1]所示，整个系统包括两个深度神经网络, 一个用于生成候选集，另一个用于排序。</p>
+ <center><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_system.png" alt="“推荐系统结构”"> </center>
+
+<p>图1：<strong>推荐系统结构：包括触发和排序2个模块，触发模块用于从海量的数据中生成较少的候选集，排序模块对触发结果做更精细的选择</strong></p>
+<p>触发模块通过输入用户的历史行为，从全量的集合里面，检索出视一个较小的子集（几百个），该模块通过协同过滤的方式，提供了相对弱一些的的个性化。用户之间的相似性通过观看的视频id, 搜索query的分词结果，以及用户的人口属性信息等来衡量。</p>
+<p>排序模块针对触发结果列表，做更加精细的筛选。排序模块采用更加丰富的特征用于描述用户和视频，通过使用特定目标函数训练得到的模型，对视频进行打分。最后得分最高的一些视频推荐给当前的用户。</p>
+<p>通过结合触发和排序两个模块，具有两个明显的优势：（1）可以使得从很大的候选集合内，以较小的时间成本推荐个性化的内容给用户（2）可以融合多个算法的结果进行排序（具体使用时，可以将每个算法的结果合并，然后利用排序模块进行打分，取最高得分的视频推荐给用户，较好地实现多推荐算法融合）。</p>
+<h1 id="触发模块"><a href="#触发模块" class="headerlink" title="触发模块"></a>触发模块</h1><p>在触发阶段，会将海量的视频集合进行初步过滤，剩余几百个用户最可能喜欢的视频。</p>
+<h2 id="用分类的思想对推荐建模"><a href="#用分类的思想对推荐建模" class="headerlink" title="用分类的思想对推荐建模"></a>用分类的思想对推荐建模</h2><p>我们把推荐问题建模为一个分类问题，预测在当前时刻$t$, 给定用户$u$和上下文$c$, 预测要观看的video的类别（有多少个候选video, 就有多少个类别）。如下式所示：</p>
+<p>$P(w_t=i|U,C)=\frac{e^{v_i\,u}}{\sum_{j\in V} \; e^{v_j\,u}}\;\;(式1)$ </p>
+<p>其中$u$表示的用户和上下文的隐语义向量，$v_j$表示第$j$个候选video的隐语义向量。隐语义向量的获取实际上是把一些稀疏的实体信息（如user, video等）映射为N维空间的稠密实向量，而DNN的作用就是从用户的浏览历史和上下文中学习隐语义向量$u$, $u$进一步可用于在$softmax$分类器中预测对应的video类别（即当前用户在上下文环境C时,最可能看的video）. </p>
+<p>尽管YouTube上存在显式反馈数据，但是论文中依然使用隐反馈数据，当用户看完一个视频则认为是正样本。这是由于用户的显示反馈行为是非常稀疏的，无法较好地进行模型的训练和预测，而用户存在大量的隐反馈行为，通过采用隐反馈数据，可以有效地以完成模型的训练和预测。</p>
+<p><strong>高效的多类别训练：</strong>为了有效地完成数十亿类别的模型训练，论文采用了一种负采样的方法，首选根据负样本的分布采样负样本，然后通过重要性加权进行纠正，具体使用的方法可以参见文献【2】。对于每个样本，其真实的标签和负采样的类别标识都通过最小化交叉熵优化模型。实际上，每次都采样几千个样本，相对于传统的softmax, 其训练速度提升100倍以上。另外一种可行的高效训练方法是$hierarchical softmax$，但由于遍历每个节点等于在将无关的类别进行分类，这使得分类更加复杂，有损模型的效果。</p>
+<p>在线服务阶段，需要在几十毫秒内计算当前用户最可能喜欢的$N$个video, 这需要一个近似的得分方案，使得时间延迟对于类别数量的增长是低于线性的。论文的采用的是基于hash的方法【3】，从点积空间寻找最近的$N$个类别作为推荐的结果。</p>
+<h2 id="模型架构"><a href="#模型架构" class="headerlink" title="模型架构"></a>模型架构</h2><p>对于每个video, 学习其在固定词典上的高维嵌入向量，并把这些向量作为神经网络的输入。每个用户的观看历史可用一个变长的video id序列来表示，每个video id可以通过嵌入的方式得到一个稠密的向量。这些向量通过聚合操作，得到单个向量（实验表示通过对所有向量求平均是最好的策略），作为神经网络的输入。这些video的嵌入向量，和其他的模型参数，都通过误差反向传播，并利用梯度下降方法进行学习。图2是触发模块的模型架构，其输入同时包括观看的video特征和和其他各种非video特征。</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_matching.png" alt="“候选推荐”"><br></center>
+
+<p>图2：<strong>触发模块结构图：嵌入的稀疏特征和和非稠密特征同时作为模型的输入，同一个用户的多个嵌入特征通过平均的方式，得到固定的尺寸，并输入到隐藏层，所有的隐藏层都是全连接。在模型训练阶段，通过最小化交叉熵，并采用梯度下降的方法对sampled softmax进行求解。在serving阶段，通过一个近似最近邻的查找，得到数百个候选推荐结果</strong></p>
+<h2 id="特征多样性"><a href="#特征多样性" class="headerlink" title="特征多样性"></a>特征多样性</h2><p>使用DNN作为矩阵分解方法的进一步泛化，可以带来的一个非常明显的优势：任何的连续特征和离散特征，都能比较容易地加入到模型中。</p>
+<p><strong>搜索历史：</strong>和观看历史非常近似，每个搜索query都可以分词为unigrams和bigrams，每个分词可以嵌入为向量，将用户的所有token对应的嵌入向量进行平均，形成代表用户搜索历史的特征。</p>
+<p><strong>人口属性：</strong>人口属性提供了非常重要的先验信息，有助于对新用户进行合理的推荐。地域和设备信息都通过嵌入的方式，拼接到整个模型的输入中。比较简单的离散或连续特征如用户性别、用户登录状态、用户年龄等，直接以归一化到0-1之间的实数形式输入到神经网络。</p>
+<p><strong>样本年龄：</strong> 经过持续的观察得知，用户更加喜欢新内容，尽管不会以牺牲相关性为代价。如果我们简单地推荐新内容给用户，可能会使得推荐的内容不够相关。使用机器学习的方式进行推荐时，由于模型的训练，都来在历史样本，会使得历史的内容更容易得到推荐。论文的推荐系统产生的推荐结果，在训练窗口的几个星期内的流行度变化显示了用户在每个时间的平均喜好程度，同时表明video的流行度不是固定不变的，而是符合多项式分布的。为了去除不同时间因素的影响，我们把样本年龄特征加入模型进行训练，在server阶段，该特征置为零，表示当前时间在训练窗口的末尾。图3显示了该方法的效果：</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/example_age_efficacy.png" alt="“样本年龄特征效果”"><br></center>
+
+<p><strong>图3：加入样本年龄特征后模型效果，使用样本年龄作为特征后，模型可以精确表示video的上传时间和独立于时间的属性。没有这个特征，模型预测的是整个训练时间窗口的平均喜好程度</strong></p>
+<h2 id="标签和上下文选择"><a href="#标签和上下文选择" class="headerlink" title="标签和上下文选择"></a>标签和上下文选择</h2><p>通过解决一个问题，然后将这个计算结果转换到特定的上下文环境中使用，是推荐业务经常使用的一种方式，这种方式对于线上的AB测试非常重要，但是离线实验对于在线的效果不是很好评估。</p>
+<p><strong>训练样本来自所有用户观看记录，而不只是推荐结果的观看记录。否则，很难推荐出新的video, 而只是在旧的内容进行exploitation；通过确保每个用户具有相同样本数，可以避免部分活跃用户的行为带来的训练误差，提升模型的在线效果；为了防止模型在原始问题上过拟合，对于分类器信息的使用需要非常谨慎。例如用户刚搜了一个query, 分类器在进行推荐时会选择搜索结果页中对应的视频，但是推荐用户刚搜过视频对于用户的体验是不好的，通过将原始的query分词后，抛弃序列信息，以bag of words的方式提供特征，分类器会不受原始搜索结果的影响</strong></p>
+<p>用户观看视频的顺序会对最终的观看概率有较大影响。因此，在训练的时候，用历史发生的行为+历史行为之后的视频观看结果作为样本进行训练，要好于用所有的行为+随机的视频观看结果进行训练。如图4所示：</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/trainning_sequence_behavior_and_lable.png" alt="“训练数据和lable组合方式”"><br></center>
+
+<p><strong>图4：lable和输入上下文。 选择样本标签及对应的上下文对于样本准备更有挑战，但是对于在线的效果提升非常有帮助,4-b的效果要远远好于4-a.在4-b中，$t_{max}$表示训练窗口的最大观察时刻，$t_{max}-t_N$表示样本年龄特征</strong></p>
+<h2 id="特征与DNN层数实验"><a href="#特征与DNN层数实验" class="headerlink" title="特征与DNN层数实验"></a>特征与DNN层数实验</h2><p>通过增加特征和DNN的层数，可以显著提升模型的效果，如图5所示。1M数量的video和搜索token嵌入分别嵌入到256维的向量，每个用户观看历史为最近的50个video和最近的50个query分词结果，softmax层输出1M个video的多项式分布概率。模型的结构是塔型，最底层的单元数最多，每向上一层单元数都减少一半。0层的网络等价于一个线性分解器，和YouTube早先的推荐系统类似。在进行网络调优时，网络的宽度和层数逐渐增加，直到带来的收益不再增加或者收敛变得困难。</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/model_performance_with_feature_depth.png" alt="“模型效果与特征、DNN层数的关系”"><br></center>
+
+<p> <strong>图5：模型效果与特征、DNN层数的关系。 Mean Average Precision (MAP) 随着特征、层数的增加而提升</strong></p>
+<h1 id="排序模块"><a href="#排序模块" class="headerlink" title="排序模块"></a>排序模块</h1><p>在排序阶段，由于只对几百个候选样本进行打分，可以采用更多特征描述video, user和video的关系。排序不仅可以上述rank模型的结果进行精选，也可用于对多个来源的候选结果进行融合。论文采用和触发模块类似的模型结构，并利用LR模型对候选结果进行打分和排序，并返回得分最高的video作为排序模块的结果输出。排序模型最终以平均每次曝光的观看时间作为优化目标，而非点击率，通过点击率作为优化目标容易推荐带有欺骗性的视屏，这些视频虽然容易吸引用户点击，但用户点进去后会很快离开。排序模型的架构如图6所示：</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/recommand_ranking.png" alt="“排序模块架构”"><br></center>
+
+<p> <strong>图6：深度排序模型架构，输入包括univalent（如当前待评分的video id）和multivalent（如用户最近浏览过的多个video id）的离散特征的嵌入、连续特征的各个幂运算等，共输入几百个特征</strong></p>
+<h2 id="特征表示"><a href="#特征表示" class="headerlink" title="特征表示"></a>特征表示</h2><p>排序模块包括离散特征（单值特征和多值特征）和连续特征，其中离散特征包括二值特征（如是否登录状态）和多个值的离散特征（如video id）, 多个离散值的特征包括univalent（如当前待评分的video id）和multivalent（如用户最近浏览过的多个video id），论文也使用了其他特征，如是否描述item(如曝光)，是否描述user/context(如query)</p>
+<h3 id="Feature-Engineering"><a href="#Feature-Engineering" class="headerlink" title="Feature Engineering"></a>Feature Engineering</h3><p>尽管深度神经网络可以减少工程的难度，但是大多数特征还是不能直接输入到神经网络，需要花费一定的时间将用户、video等特征转化为可以直接输入的形式。</p>
+<p>最有用的特征是描述用户之前和item或者类似item的交互特征，如用户从对应的频道看的视频个数、用户最近看该主题video的时间，这类特征具有很强的泛化性能，候选集分数，候选集来源，历史的video曝光情况等非常重要。</p>
+<h3 id="Embedding-Categorical-Features"><a href="#Embedding-Categorical-Features" class="headerlink" title="Embedding Categorical Features"></a>Embedding Categorical Features</h3><p>同触发模块类似，将稀疏的离散特征嵌入到稠密的表示空间，用于神经网络的输入。每个独有的ID序列都会被映射到这样的一个空间，映射后特征的维度同ID值个数的对数成正比。在训练之前，通过一些扫描所有的ID建立查找表，在后续的训练过程中可以直接查找和更新这个表。对于ID值非常多的空间，根据点击的频率进行从高到低进行排序，对TOP N的ID进行嵌入，其他ID嵌入结果直接由0向量表示。multivalent离散特征的嵌入结果是多个univalent嵌入结果的均值。</p>
+<p>在同样的ID空间的不同特征，都共享该特征的嵌入结果。如曝光的video ID，上次观看的video ID等。不同的特征虽然共享嵌入的结果，但是分别输入到神经网络进行训练，可以在学习时利用到每个特征表示的具体信息。<strong>嵌入结果的共享对于模型提升泛化性能、训练速度，减少内存消耗都是非常重要的。</strong></p>
+<h3 id="Normalizing-Continuous-Features"><a href="#Normalizing-Continuous-Features" class="headerlink" title="Normalizing Continuous Features"></a>Normalizing Continuous Features</h3><p>通常神经网络对于特征的尺度和分布非常敏感，而基于树的组合方法对尺度和分布不敏感。因此对于论文模型，为连续特征选择合适的规范化方法非常重要。为了使得原始特征映射到0-1之间的均匀分布，采用公式2进行特征的转换，该转换类似于在训练之前，为特征值的分位数进行差值。</p>
+<p>$\bar x = \int_{-\infty}^xd\,f\;\;(式2)$</p>
+<p>除了规范化后的$\bar x$, 同时增加$\bar x^2$和$\sqrt{\bar x}$,同时捕获原始特征的超线性和次线性，赋予模型更加丰富的表达能力，实验证明通过这些特征的加入，可以提升模型的效果。</p>
+<h2 id="期望浏览时间建模"><a href="#期望浏览时间建模" class="headerlink" title="期望浏览时间建模"></a>期望浏览时间建模</h2><p>论文的目标是对期望浏览时间进行建模，其中正样本是有点击行为的样本，负样本是没有发生点击行为的样本。每个正样本都有对应的浏览时间，负样本的浏览时间为0. 为了预测期望浏览时间，采用加权逻辑回归的方法，正样本的权重是对应的浏览时间，负样本使用单位权重，采用交叉熵作为目标函数。这样模型学习的优势比odds为$\frac{\sum T_i}{N-k}$, 关于优势比的定义可参见【3】。其中$N$是训练样本数，$k$是正样本数，$T_i$对应第i个视频的浏览时间。由于实际正样本的数量比较少，优势比等价于$E[T](1+P)$, $P$是点击率，$E[T]$是期望浏览时间，由于$P$比较小,该目标进一步可以近似为平均观看时间。在预测阶段，使用指数函数$e^x$作为激活函数得到优势比odds, 作为预测的平均浏览时间的近似值。</p>
+<h2 id="针对隐藏层的实验"><a href="#针对隐藏层的实验" class="headerlink" title="针对隐藏层的实验"></a>针对隐藏层的实验</h2><p>表1是不同隐藏层配置对应的对于next-day的预测结果，评估指标是<strong>用户加权平均损失</strong>，每个配置都是评估同一个页面的正负样本，如果正样本分数低于负样本，那么正样本的浏览时间是<strong>预测错误浏览时长</strong>， <strong>用户加权平均损失</strong>定义为<strong>所有预测错误的浏览时间占比所有评估对的浏览时间之和</strong></p>
+<p>结果显示，增加神经网络的层数和每一层的宽度，都可以提升模型的效果。在CPU预算允许的前提下，论文采用了1024 ReLU =》 512 ReLU =》 256 ReLU的配置。不使用连续特征的幂特征，损失增加0.2%。正负样本权值设置相等，损失增加非常明显，达到4.1%。</p>
+<center><br><img src="/2017/08/20/dnn_for_youtube_recommandation/evaluation_of_diffrent_configure.png" alt="“隐藏层配置对预测结果的影响”"><br><strong>表1：不同ReLU单元隐藏层配置对next-day的预测结果影响，评估指标是用户加权平均损失</strong></center>
+
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>论文描述了YouTube视频推荐的深度网络结构，主要分为触发模块和排序模块</p>
+<p><strong>触发模块：</strong>论文采用的深度协同过滤，能够使用各种信号特征，并通过多层网络建模信号之间的交互，效果好于之前的矩阵分解模型；通过建模时考虑不对称的行为序列，能够更好地使用所有信息对未来进行预测，使得离线训练的模型能更好地用于在线预测；对于分类器的所有信号特征不直接使用，而是对其中一些特征经过仔细分析和加工后使用，能够获得更好的推荐效果；使用样本的年龄特征，能够避开时间因素的干扰，使得预测结果独立于时间特征。</p>
+<p><strong>排序模块：</strong>模型在预测平均观看时间方面，好于之前的线性方法、组合树的方法。通过使用标签之前的用户行为，用户的效果有较大的提升；深度网络需要对离散特征做嵌入处理，对连续特征做规范化处理；多层网络能够有效地建模数百个特征之间的非线性交互；采用加权逻辑回归的方式，对于正负样本分别赋予不同全值，使得我们能够较好地学习优势比，并用优势比来预测浏览时间。在使用用户平均加权损失来评估效果时，该方法的效果要远远好于直接用点击率进行建模。</p>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><p>【1】P Covington, J Adams, E Sargin. Deep Neural Networks for YouTube Recommendations, Acm Conference on Recommender Systems, 2016 :191-198<br>【2】S. Jean, K. Cho, R. Memisevic, and Y. Bengio. On using very large target vocabulary for neural machine translation. CoRR, abs/1412.2007, 2014.<br>【3】T. Liu, A. W. Moore, A. Gray, and K. Yang. An<br>investigation of practical approximate nearest<br>neighbor algorithms. pages 825–832. MIT Press, 2004.<br>【4】nside_Zhang, <a href="http://blog.csdn.net/lanchunhui/article/details/51037264" target="_blank" rel="noopener">http://blog.csdn.net/lanchunhui/article/details/51037264</a>, 2016</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/个性化推荐/" rel="tag">#个性化推荐</a>
+          
+            <a href="/tags/深度学习/" rel="tag">#深度学习</a>
+          
+            <a href="/tags/DNN/" rel="tag">#DNN</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/30/qualified_model/" rel="next" title="一种简单的优质挖掘模型">
+                <i class="fa fa-chevron-left"></i> 一种简单的优质挖掘模型
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/23/clapack/" rel="prev" title="CLAPACK学习">
+                CLAPACK学习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#系统概述"><span class="nav-number">1.</span> <span class="nav-text">系统概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#触发模块"><span class="nav-number">2.</span> <span class="nav-text">触发模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#用分类的思想对推荐建模"><span class="nav-number">2.1.</span> <span class="nav-text">用分类的思想对推荐建模</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型架构"><span class="nav-number">2.2.</span> <span class="nav-text">模型架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特征多样性"><span class="nav-number">2.3.</span> <span class="nav-text">特征多样性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标签和上下文选择"><span class="nav-number">2.4.</span> <span class="nav-text">标签和上下文选择</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特征与DNN层数实验"><span class="nav-number">2.5.</span> <span class="nav-text">特征与DNN层数实验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#排序模块"><span class="nav-number">3.</span> <span class="nav-text">排序模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#特征表示"><span class="nav-number">3.1.</span> <span class="nav-text">特征表示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Feature-Engineering"><span class="nav-number">3.1.1.</span> <span class="nav-text">Feature Engineering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Embedding-Categorical-Features"><span class="nav-number">3.1.2.</span> <span class="nav-text">Embedding Categorical Features</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Normalizing-Continuous-Features"><span class="nav-number">3.1.3.</span> <span class="nav-text">Normalizing Continuous Features</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#期望浏览时间建模"><span class="nav-number">3.2.</span> <span class="nav-text">期望浏览时间建模</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对隐藏层的实验"><span class="nav-number">3.3.</span> <span class="nav-text">针对隐藏层的实验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
