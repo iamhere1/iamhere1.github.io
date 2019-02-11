@@ -1,0 +1,794 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="推荐算法,矩阵分解,隐语义模型,协同过滤," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="矩阵分解模型分布式求解">
+<meta name="keywords" content="推荐算法,矩阵分解,隐语义模型,协同过滤">
+<meta property="og:type" content="article">
+<meta property="og:title" content="矩阵分解模型的分布式求解">
+<meta property="og:url" content="http://learning.github.com/2018/01/03/mf/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="矩阵分解模型分布式求解">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://learning.github.com/2018/01/03/mf/data_model.png">
+<meta property="og:updated_time" content="2019-01-28T16:35:17.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="矩阵分解模型的分布式求解">
+<meta name="twitter:description" content="矩阵分解模型分布式求解">
+<meta name="twitter:image" content="http://learning.github.com/2018/01/03/mf/data_model.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 矩阵分解模型的分布式求解 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                矩阵分解模型的分布式求解
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-01-03T00:00:00+08:00" content="2018-01-03">
+              2018-01-03
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/模型与算法/" itemprop="url" rel="index">
+                    <span itemprop="name">模型与算法</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2018/01/03/mf/" class="leancloud_visitors" data-flag-title="矩阵分解模型的分布式求解">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+<p>矩阵分解(mf)模型在推荐系统中有非常不错的表现，相对于传统的协同过滤方法，它不仅能通过降维增加模型的泛化能力，也方便加入其他因素（如数据偏差、时间、隐反馈等）对问题建模，从而产生更佳的推荐结果。本文主要介绍mf一些概念，基于sgd的mf分布式求解，基于als的mf分布式求解。<br>该文涉及的所有分布式求解都是基于openmit[1]的ps框架，因此分布式求解都是在ps基础上进行实现的。相对于spark mllib的mf实现，在同样的资源情况下，该框架下的实现能支持更大规模的矩阵分解。</p>
+<h1 id="矩阵分解相关概念"><a href="#矩阵分解相关概念" class="headerlink" title="矩阵分解相关概念"></a>矩阵分解相关概念</h1><p>我们接触到很多的矩阵分解相关的一些概念，svd,pca,mf推荐模型,als等，如下是对这些概念的一些解释。</p>
+<ul>
+<li><p><strong>svd分解</strong><br>svd分解,是将一个矩阵A分解为三个矩阵，如下所示：<br>$A_{m,n}=U_{m,m} I_{m,n} V_{n,n}^T  (1)$<br>其中矩阵$I$对角线元素为奇异值，对应$AA^T$的特征值的平方根。$U$的列为$MM^T$的特征向量(正交基向量)，称为$M$的左奇异向量。$V$的列为$M^TM$的特征向量(正交基向量)，称为$M$的右奇异向量。<br>为了减少存储空间，可以用前$k$大的奇异值来近似描述矩阵$I$,$U$和$V^T$用对应前k大奇异值的左奇异向量和右奇异向量来近似，如下所示：<br>$A_{m,n} \approx U_{m,k} I_{k,k} V_{k,n}^T  (2)$</p>
+</li>
+<li><p><strong>pca</strong><br>主成分分析，对原始数据进行降维使用。pca可以通过svd分解来实现，具体可以对公式(2)两边同时乘$V_{n,k}$,如下所示：<br>$A_{m,n} V_{n,k} \approx U_{m,k} I_{k,k} V_{k,n}^T V_{n,k}$<br>=&gt; $A_{m,n} V_{n,k} \approx U_{m,k} I_{k,k}$<br>=&gt; $A_{m,n} V_{n,k} \approx A’_{m,k}(3)$<br>经过公式3, 矩阵A由n列降为k列，如果要对行进行降维，其推导类似。</p>
+</li>
+<li><p><strong>mf推荐模型</strong><br>在推荐领域，一般不直接使用svd进行矩阵分解，因为svd要求所有的矩阵元素不能缺失，而推荐所使用的的rating矩阵很难是完整的（互联网上的item经常海量的，一个user很难有机会接触所有的item, 导致user-item矩阵存在大量的元素缺失)。如果使用svd分解进行推荐，首先就需要对缺失的矩阵元素进行填充，不仅耗费大量的精力，而且填充的效果并不能保证准确。<br>因此，对于个性化推荐，一般直接对已知的元素建立矩阵分解模型，如式4所示：<br>$MIN_{PQ} \sum_{u,i\in\mathbb K} {(r_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)（4）$<br>对于(4)这样的建模，有些学者称为svd对已知元素建模(The goal of SVD, when restricted to the known ratings)[2].</p>
+</li>
+<li><p><strong>als</strong><br>als（交替最小二乘）是一种矩阵分解优化算法。交替求解user向量和item向量，在求解user向量的时候固定item向量，在求解item向量的时候固定user向量，直到算法收敛或达到终止条件。<br>als算法可用于求解矩阵分解模型模型如公式4, 也可用于更加灵活的矩阵分解模型，如隐反馈矩阵分解模型[3], 更加灵活地用于个性化推荐。</p>
+</li>
+<li><p><strong>非负矩阵分解[4]</strong><br>非负矩阵分解，是指将非负的大矩阵分解成两个非负的小矩阵。其目标函数和约束如下：<br>$MIN_{PQ} \sum_{u,i\in\mathbb K} {(r_{ui} -<br>p_u^Tq_i）}^2 （5）$<br>$subject \; to \; r_{ui} \geq 0\;\; and \;\;p_{uk} \geq 0 \;\; and \;\; q_{ik} \geq 0 $<br>相对于其他矩阵分解，非负矩阵分解的输入元素为非负，分解后矩阵的元素也非负。从计算上讲，虽然分解元素为负值是正确的，但是在很多情况下，在实际问题中是没有意义的。非负矩阵广泛应用于图像分析、文本聚类、语音处理、推荐系统等。</p>
+</li>
+</ul>
+<h1 id="sgd求解in-openmit"><a href="#sgd求解in-openmit" class="headerlink" title="sgd求解in openmit"></a>sgd求解in openmit</h1><h2 id="目标函数及优化推导"><a href="#目标函数及优化推导" class="headerlink" title="目标函数及优化推导"></a>目标函数及优化推导</h2><p>我们令$L=\sum_{u,i\in\mathbb K} {(r_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)$</p>
+<p>对于user $u$和item $i$(rating大于0), 目标函数：$MIN_{PQ} (L)={(r_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)$</p>
+<p>令$L$对$p_{u,k}$,$q_{i,k}$求导，如下所示：</p>
+<p>$-\frac{1}{2}\frac{\varphi L}{\varphi p_{u,k}}=e_{u,i}q_{i,k}-\lambda p_{u,k}\;(6)$</p>
+<p>$-\frac{1}{2}\frac{\varphi L}{\varphi q_{i,k}}=e_{u,i}p_{u,k}-\lambda q_{i,k}\;(7)$</p>
+<p>其中$e_{u,i}=r_{ui} - p_u^Tq_i$。</p>
+<p>利用梯度下降法迭代更新user向量p和item向量q, 如下所示：</p>
+<p>$p_{u,k} = p_{u,k}+\alpha(e_{u,i}q_{i,k}-\lambda p_{u,k})\;(8)$</p>
+<p>$q_{i,k} = q_{i,k}+\alpha(e_{u,i}p_{u,k}-\lambda q_{i,k})\;(9)$</p>
+<h2 id="分布式实现in-openmit"><a href="#分布式实现in-openmit" class="headerlink" title="分布式实现in openmit"></a>分布式实现in openmit</h2><p>在openmit中的矩阵存储模型如下图所示:</p>
+<p><img src="/2018/01/03/mf/data_model.png" alt="“矩阵存储模型”"> </p>
+<p><center>图1：矩阵存储模型</center><br>我们假定user的数量远大于item数量，P矩阵代表user向量，Q矩阵代表item向量，R代表rating元素。此时我们将Q向量分布式存储在server集群，P向量分布式存储在worker集群，每个worker节点同时存储和该user相关联的rating元素R。</p>
+<p>每个worker节点在计算user向量的时候，由于只需要用到本地user向量、与本地user相关的item向量和rating元素,而user向量和相关的rating元素存储在本地，因此只需要从server端拉取对应的item向量，就可以根据式6和式7完成user和item的梯度计算。利用公式8更新user向量，并将item梯度向量push给server集群，server端根据当前item向量权重，及worker端push的item梯度信息，根据式9更新item向量。具体流程参见如下描述:</p>
+<p><strong>worker端流程</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//mf 分布式sgd求解woker端</span></span><br><span class="line">load matrix rating data, each user data is loaded by only one worker;</span><br><span class="line"><span class="keyword">for</span> each epoch:</span><br><span class="line">    <span class="keyword">for</span> each batch:</span><br><span class="line">        get batch data B;</span><br><span class="line">        get user weights <span class="keyword">for</span> users in B, (initialize user weights <span class="keyword">if</span> <span class="keyword">not</span> initialized)</span><br><span class="line">        pull item weights from server</span><br><span class="line">        <span class="keyword">for</span> each user, item pair weith rating &gt; <span class="number">0</span>:</span><br><span class="line">            update user gradient according to eq <span class="number">6</span>;</span><br><span class="line">            update item gradient according to eq <span class="number">7</span>;</span><br><span class="line">        update user weights according to eq <span class="number">8</span></span><br><span class="line">        push item gradients to server</span><br></pre></td></tr></table></figure>
+<p><strong>server端流程</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//mf 分布式sgd求解server端</span></span><br><span class="line"><span class="keyword">while</span>(<span class="literal">true</span>):</span><br><span class="line">    receive a requests from worker</span><br><span class="line">    if request type is 'pull':</span><br><span class="line">        <span class="keyword">if</span> the item weights is <span class="keyword">not</span> initialized:</span><br><span class="line">            initialize the item weights;</span><br><span class="line">        response the item weights to worker</span><br><span class="line">    if request type is 'push':</span><br><span class="line">        receive the item gradients</span><br><span class="line">        update item weights accoreding to eq <span class="number">9</span></span><br></pre></td></tr></table></figure>
+<p>当user的数量远小于item数量的时候，为需要减少通讯开销，需要更改输入文件，实现将item向量Q及rating元素R存储worker端，user向量P存储在server端。这样在进行数据传输的时候，worker端将会拉取user权重信息，push user梯度信息。通过传输user而非item信息，有效减少数据的通讯开销。</p>
+<h1 id="als求解in-openmit"><a href="#als求解in-openmit" class="headerlink" title="als求解in openmit"></a>als求解in openmit</h1><h2 id="目标函数及优化推导-1"><a href="#目标函数及优化推导-1" class="headerlink" title="目标函数及优化推导"></a>目标函数及优化推导</h2><h3 id="explicit-als"><a href="#explicit-als" class="headerlink" title="explicit als"></a>explicit als</h3><p>explicit als只针对user-item矩阵中已知的rating元素进行建模，目标函数如式4所示，<br>我们令$L=\sum_{u,i\in\mathbb K} {(r_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)$</p>
+<p>为求解user向量p, 固定所有item向量$q_i$, 令$L$对$p_u$求导等于0，</p>
+<p>$-\frac{1}{2}\frac{\varphi L}{\varphi p_{u,k}} = 0$</p>
+<p>=&gt;$\sum_{i} (r_{ui} -<br>p_u^Tq_i）q_{i,k}-\lambda p_{u,k}=0\;$</p>
+<p>=&gt; $\sum_{i} (r_{ui} -<br>p_u^Tq_i）q_{i}-\lambda p_{u}=0\;$</p>
+<p>=&gt; $(\sum_iq_iq_i^T+\lambda I)p_u=\sum_iq_ir_{ui}\;(10)$</p>
+<p>同理，为求解item向量q, 固定所有user向量$p_u$, 令$L$对$q_i$求导等于0，可得<br>$(\sum_up_up_u^T+\lambda I)q_i=\sum_up_ur_{ui}\;(11)$</p>
+<p>对于式10和式11,利用cholesky分解的方法求解对应的$p$和$q$向量。</p>
+<h3 id="implicit-als"><a href="#implicit-als" class="headerlink" title="implicit als"></a>implicit als</h3><p>对于所有的rating元素进行建模，通过$b_{ui}$建模user是否喜欢item, 通过$c_{ui}$建模user对item喜欢的程度，具体如下所示：</p>
+<p>目标函数：$MIN_{P,Q}\sum_{u,i\in\mathbb K} c_{ui}{(b_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)\;\;(12)$</p>
+<p>其中$b_{ui} =  \begin{cases}<br>1,  &amp; r_{ui}&gt;0\\<br>0,  &amp; r_{ui}=0<br>\end{cases}<br>$</p>
+<p>$c_{ui} = 1 + \alpha r_{ui}$</p>
+<p>令$L=\sum_{u,i\in\mathbb K} c_{ui}{(b_{ui} -<br>p_u^Tq_i）}^2 + \lambda(p_u^Tp_u+q_i^Tq_i)$</p>
+<p>为求解user向量$p_u$, 固定所有item向量$q_i$, 令$L$对$p_u$求导等于0，<br>同时，对每个用户，引入$n\times n$矩阵$c^u$, $c^u_{ii}的值为c_{ui}$, 其余元素为0。</p>
+<p>$-\frac{1}{2}\frac{\varphi L}{\varphi p_{u,k}} = 0$</p>
+<p>=&gt;$\sum_{i} c_{ui}(b_{ui} -<br>p_u^Tq_i）q_{i,k}-\lambda p_{u,k}=0\;$</p>
+<p>=&gt;$\sum_{i} c_{ui}(b_{ui} -<br>p_u^Tq_i）q_{i}-\lambda p_{u}=0\;$</p>
+<p>=&gt;$\sum_{i} c^u_{ii}b_{ui}q_i-c^u_{ii}p^T_uq_iq_i = \lambda p_u\;\;(13)$</p>
+<p>其中:<br>$\sum_{i} c^u_{ii}b_{ui}q_i=Q^TC^ub_u\;(14)$</p>
+<p>$\sum_{i} c^u_{ii}p^T_uq_iq_i = \sum_{i} q_i c^u_{ii}q^T_ip_u=Q^TC^uQp_u \;(15)$</p>
+<p>其中$Q$的每一行表示每个item向量。</p>
+<p>将式14和式15代入式13，得到：<br>$(Q^TC^uQ+\lambda I)p_u = Q^TC^ub_u\;(16)$</p>
+<p>此时如果直接根据式16进行求解，假定item的个数为$n$, 每个item向量的维度为$f$, 对每个user向量的求解，仅$Q^TC^uQ$的计算就需要$O(f^2n)$.</p>
+<p>在论文[3]中，作者使用了一种有效的加速方式，$Q^TC^uQ=Q^TQ+Q^T(C^u-I)Q$, 其中$Q^TQ$不依赖具体的用户，可以在计算所有user向量之前计算好，$C^u-I$只有$n_u$个对角线元素非零。由于$n_u ≪ n$，$Q^TC^uQ$的计算效率会明显提高。同理，由于$b_u$也只有$n_u$个非零值，$Q^TC^ub_u$的计算效率也会非常高。假定cholesky的求解需要$O(f^3)$,则每个user向量计算的复杂度为$O(f^2n_u+f^3)$</p>
+<p>同理，为求解item向量$q_i$, 固定所有user向量$p_u$, 令$L$对$q_i$求导等于0, 可得：<br>$(P^TC^iP+\lambda I)q_i = P^TC^ib_i\;(17)$</p>
+<h2 id="分布式实现in-openmit-1"><a href="#分布式实现in-openmit-1" class="headerlink" title="分布式实现in openmit"></a>分布式实现in openmit</h2><p>als的分布式实现和sgd的分布式实现流程基本相似，不同之处在于每个worker阶段计算的不是user和item的梯度，而是通过cholesky分解直接计算出user和item的权重。</p>
+<p>我们依然假设user的数量远远多于item的数量，worker端存储user权重和rating元素，server端存储item权重。worker端根据als计算出的user权重直接赋值给本地user向量，并将item权重push给server,由server直接赋值为新的item权重。</p>
+<p>具体流程如下伪代码所示:</p>
+<p><strong>worker端流程</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//mf 分布式als求解woker端</span></span><br><span class="line">load matrix rating data, each user data loaded by only one worker;</span><br><span class="line"><span class="keyword">for</span> each epoch:</span><br><span class="line">    <span class="keyword">for</span> each batch:</span><br><span class="line">        get batch data B;</span><br><span class="line">        get user weights <span class="keyword">for</span> users in B, (initialize user weights <span class="keyword">if</span> <span class="keyword">not</span> initialized)</span><br><span class="line">        pull item weights from server</span><br><span class="line">        pre compute Q'Q with item weight <span class="built_in">vector</span></span><br><span class="line">        <span class="keyword">for</span> each user:</span><br><span class="line">            solve eq <span class="number">16</span> by cholesky method to get user weight <span class="built_in">vector</span></span><br><span class="line">            assign <span class="keyword">new</span> user weight <span class="built_in">vector</span></span><br><span class="line">        pre compute P'P with <span class="keyword">new</span> user weight <span class="built_in">vector</span></span><br><span class="line">        <span class="keyword">for</span> each item:</span><br><span class="line">            solve eq <span class="number">17</span> by cholesky method to get item weight <span class="built_in">vector</span></span><br><span class="line">        push item weight to server</span><br></pre></td></tr></table></figure>
+<p><strong>server端流程</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//mf 分布式als求解server端</span></span><br><span class="line"><span class="keyword">while</span>(<span class="literal">true</span>):</span><br><span class="line">    receive a requests from worker</span><br><span class="line">    if request type is 'pull':</span><br><span class="line">        <span class="keyword">if</span> the item weights is <span class="keyword">not</span> initialized:</span><br><span class="line">            initialize the item weights;</span><br><span class="line">        response the item weights to worker</span><br><span class="line">    if request type is 'push':</span><br><span class="line">        receive the item weights</span><br><span class="line">        assign <span class="keyword">new</span> item weights <span class="built_in">vector</span></span><br></pre></td></tr></table></figure>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1]<a href="https://github.com/openmit/openmit" target="_blank" rel="noopener">https://github.com/openmit/openmit</a><br>[2]Robert M. Bell, Yehuda Koren, “Scalable Collaborative Filtering with Jointly Derived Neighborhood Interpolation Weights”, IEEE International Conference on Data Mining, 2007,pp.43-52<br>[3]Yifan Hu, Yehuda Koren, Chris Volinsky, “Collaborative Filtering for Implicit Feedback Datasets”, Eighth IEEE International Conference on Data Mining, 2009,pp.263-272<br>[4]CJ Lin, “Projected Gradient Methods for Nonnegative Matrix Factorization”,《Neural Computation》,2007;19(10):2756</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/推荐算法/" rel="tag">#推荐算法</a>
+          
+            <a href="/tags/矩阵分解/" rel="tag">#矩阵分解</a>
+          
+            <a href="/tags/隐语义模型/" rel="tag">#隐语义模型</a>
+          
+            <a href="/tags/协同过滤/" rel="tag">#协同过滤</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/23/clapack/" rel="next" title="CLAPACK学习">
+                <i class="fa fa-chevron-left"></i> CLAPACK学习
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/01/13/lbfgs/" rel="prev" title="lbfgs算法与源码学习">
+                lbfgs算法与源码学习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#矩阵分解相关概念"><span class="nav-number">1.</span> <span class="nav-text">矩阵分解相关概念</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sgd求解in-openmit"><span class="nav-number">2.</span> <span class="nav-text">sgd求解in openmit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#目标函数及优化推导"><span class="nav-number">2.1.</span> <span class="nav-text">目标函数及优化推导</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式实现in-openmit"><span class="nav-number">2.2.</span> <span class="nav-text">分布式实现in openmit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#als求解in-openmit"><span class="nav-number">3.</span> <span class="nav-text">als求解in openmit</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#目标函数及优化推导-1"><span class="nav-number">3.1.</span> <span class="nav-text">目标函数及优化推导</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#explicit-als"><span class="nav-number">3.1.1.</span> <span class="nav-text">explicit als</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#implicit-als"><span class="nav-number">3.1.2.</span> <span class="nav-text">implicit als</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分布式实现in-openmit-1"><span class="nav-number">3.2.</span> <span class="nav-text">分布式实现in openmit</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">4.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>

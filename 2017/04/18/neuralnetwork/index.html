@@ -1,0 +1,1059 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="深度学习,神经网络,学习总结," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="深度学习、神经网络学习">
+<meta name="keywords" content="深度学习,神经网络,学习总结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="神经网络与深度学习笔记">
+<meta property="og:url" content="http://learning.github.com/2017/04/18/neuralnetwork/index.html">
+<meta property="og:site_name" content="个人学习博客">
+<meta property="og:description" content="深度学习、神经网络学习">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/nn_structure.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/single_unit_network.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/sigmod_function.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/norm_distribution.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/norm_distribution2.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/multi_layer_single_neural_network.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/derivative_of_sigmoid_function.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/cnn_image.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/multi_feaure_map.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/max-pooling.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/multi_max_pooling.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/cnn_architecture.png">
+<meta property="og:image" content="http://learning.github.com/2017/04/18/neuralnetwork/tanh_image.png">
+<meta property="og:updated_time" content="2019-01-28T16:35:17.508Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="神经网络与深度学习笔记">
+<meta name="twitter:description" content="深度学习、神经网络学习">
+<meta name="twitter:image" content="http://learning.github.com/2017/04/18/neuralnetwork/nn_structure.png">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+  <title> 神经网络与深度学习笔记 | 个人学习博客 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">个人学习博客</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                神经网络与深度学习笔记
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2017-04-18T00:00:00+08:00" content="2017-04-18">
+              2017-04-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/模型与算法/" itemprop="url" rel="index">
+                    <span itemprop="name">模型与算法</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+             <span id="/2017/04/18/neuralnetwork/" class="leancloud_visitors" data-flag-title="神经网络与深度学习笔记">
+               &nbsp; | &nbsp;
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               <span class="post-meta-item-text">阅读次数 </span>
+               <span class="leancloud-visitors-count"></span>
+              </span>
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+      displayMath: [ ['$$','$$']],
+      processEscapes: true
+    }
+  });
+</script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML,http://myserver.com/MathJax/config/local/local.js">
+</script>
+
+
+
+
+
+<h1 id="神经网络与深度学习"><a href="#神经网络与深度学习" class="headerlink" title="神经网络与深度学习"></a>神经网络与深度学习</h1><p>本文是自己学习神经网络与深度学习的笔记总结，相关内容和图片主要来自【1】，并适当加入自己的理解。如【1】中所描述，文章中的很多观点更多的是代表一种启发式的思考，并不一定是严格推理证明。如有不对，欢迎指正。</p>
+<h2 id="神经网络相关基础"><a href="#神经网络相关基础" class="headerlink" title="神经网络相关基础"></a>神经网络相关基础</h2><p> <strong>感知器：</strong><br> 对n个特征加权求和，若结果大于一定值threashold，则结果为1，小于threashold则结果为0。</p>
+<p> $output = \begin{cases}<br>1,  &amp; if \sum_jw_jx_j &gt; threashold\\<br>0,  &amp; if \sum_jw_jx_j &lt; threashold<br>\end{cases} （1）$</p>
+<p> 一个感知器可以对应一个初步的决策，输入对应特征，输出是决策的结果。而我们人类大脑的决策往往是复杂的，一种比较受欢迎的观点是由多层次的感知器组成，第一层的每个感知器获取最初步的感知，输出最初步的决策结果。第二层的每个感知器，基于第一层的决策结果，进行更复杂的决策，依次类推，最后一层的感知器的输出为最终的决策结果。</p>
+<p><strong>sigmoid神经元：</strong></p>
+<p>感知器神经元存在一个缺点，当输入有轻微变化的时候，输出结果并不会跟着有轻微的变化，或者可能导致结果直接从0变化到1（或1到0）。这个缺点使得包含感知器的神经网络参数学习比较麻烦。</p>
+<p>通过引入sigmoid神经元，可以解决这个问题。sigmoid神经元的输出可用如下公式来描述：</p>
+<p>$output = \frac{1}{1+exp(-\sum_jw_jx_j-b)}（2）$</p>
+<p>PS:多层感知器是由多个层次的sigmoid神经元组成，而不是感知器神经元组成。</p>
+<p><strong>神经网络结构</strong></p>
+<p>神经网络有很多结构，不同的结构实际上对不同的函数集合，如常见的网络结构有RNN,CNN,MLP等。如下图，是一个多层感知器结构，包括输入层、隐含层、输出层。其中输入层神经元个数和特征数量相同，输出层神经元个数取决于具体的应用，如针对分类问题其个数等于类别数量，针对回归问题等于1。对于分类问题，为什么输出神经元个数等于类别数量$n$，而不是$log(n)$, 可以参考文章最后部分<strong>问题1</strong>.</p>
+<p><img src="/2017/04/18/neuralnetwork/nn_structure.png" alt="“多层神经网络”"> </p>
+<p><strong>损失函数</strong></p>
+<p>损失函数用于描述模型的好坏，常见的损失函数有均方误差（MSE）、交叉熵等。分类错误样本个数也能描述模型的好坏，却为什么不能用于损失函数，其原因可以参考文章最后部分<strong>问题2</strong>.</p>
+<p><strong>MSE</strong>的定义如公式3所示：</p>
+<p>$C(w, b) = \frac{1}{2n}\sum_x||y(x)-a||^2（3）$</p>
+<p>$C(w, b)$表示样本预测与真实值的均方误差，$n$为样本个数，y(x)为样本$x$的标签，$a$为样本$x$的预测值。</p>
+<p><strong>交叉熵</strong>的定义如公式4所示：</p>
+<p>$C = - \frac{1}{n}\sum_x[y\ln a+(1-y)\ln (1-a)]（4）$</p>
+<p>$n$为样本数量，$y$为对应的标签，$a$为对应的预测值。</p>
+<p><strong>梯度下降算法</strong></p>
+<p>对模型参数的更新，会导致损失函数的值跟着变化。更小的损失函数值$C(w, b)$意味着到更好的模型参数。为了求解最优参数值，理论上可以通过分析等相关方法（如导数等于0）求解，我们在训练神经网络时，为何用梯度下降而非分析方法呢？其原因可以参考文章最后部分<strong>问题3</strong>。为什么要在参数的梯度方向而非其他方向更新参数，来逐步减少损失函数的值，可以参考文章最后部分<strong>问题4</strong>。梯度下降公式如下所示。</p>
+<p>$w=w - \eta\frac{\alpha C}{\alpha w}（5）$</p>
+<p>$b=b - \eta\frac{\alpha C}{\alpha b}（6）$</p>
+<p>其中w为模型权重，b为模型偏差，$\eta$是学习率。通过使用公式4和公式5，每次通过输入所有（或部分）样本特征和标签进行迭代，逐步减少损失函数值，直到我们认为达到最优值（如误差函数取值小于一定值，迭代次数达到一定值，更新速率非常小等）</p>
+<p>由于实际场景中样本可能非常多，通过公式5、公式6直接求解，训练会很耗费时间，一种改进的方式是随机梯度下降，每次迭代不是使用所有的样本，而是随机选取一部分样本（mini batch）进行求解,该方法称为SGD. 当minibath 的尺寸为1时， 称为在线学习或增量学习，此时每次模型更新都从单一的样本中进行学习。增量学习能够实时地调整模型，但其缺点是可能会导致模型波动较大。</p>
+<h2 id="BP学习算法"><a href="#BP学习算法" class="headerlink" title="BP学习算法"></a>BP学习算法</h2><p>BP算法，即误差反向传播算法，采用误差反向传播的方式，令误差函数对各层神经元的参数进行求导，利用GD/SGD等方法进行参数求解。为具体说明该算法，我们对符号进行如下定义：</p>
+<p>$⊙$: 表示两个向量或矩阵对应同一位置的元素相乘</p>
+<p>$w_{jk}^l$: 第$l-1$层的第$k$个神经元到第$l$层的第$j$个神经元的权重</p>
+<p>$b_j^l$: 第$l$层的第$j$个神经元的偏差。</p>
+<p>$z_j^l$: $l$层第$j$个神经元的激活函数输入, $z_j^l = \sum_k w_{jk}^l a_k^{l-1} + b_j^l$ </p>
+<p>$a_j^l$: 第$l$层第$j$个神经元的激活函数输出,  $a_j^l=\sigma(\sum_k w_{jk}^la_k^{l-1}+b_j^l) = \sigma(z_j^l)$</p>
+<p>其矩阵方式描述如下：</p>
+<p>$z^l = w^l a^{l-1}+b^l$</p>
+<p>$a^l = \sigma (w^l a^{l-1}+b^l) = \sigma(z^l)$</p>
+<p>其中$a^l$表示所有第$l$层的神经元输出， $w^l$表示第$l-1$层到第$l$层的所有权重构成的矩阵，$w_{ij}^l$表示第$l$层第$i$个神经元和第$l-1$层第$j$个神经元之间的权重，$b^l$表示第$l$层所有神经元的偏差参数构成的向量,$\sigma$函数作用于一个向量等价于先将该函数作用于向量的每个元素，然后作用后的结果按照对应排序组装成向量,即$\sigma([x_1, x_2, … , x_n]) = [\sigma(x_1), \sigma(x_2), … , \sigma(x_n)]$</p>
+<p>为方便描述，我们定义误差函数对第$l$层第$j$个神经元输入求导：$\delta_j^l = \frac{\Phi C}{\Phi z_j^l}$  </p>
+<p>易知，输出层第$j$个神经元的求导结果为：$\delta_j^L = \frac{\Phi C}{\Phi z_j^L}= \frac{\Phi C}{\Phi a_j^L} \sigma’(z_j^L)$    (BP1)</p>
+<p>第$l$层各个神经元的求导表示：$\delta^l = ((w^{(l+1)})^T\delta ^ {l+1}) ⊙ \sigma’(z^l)$  (BP2)</p>
+<p>误差函数对偏差求导结果：$\frac{\Phi C}{\Phi b_j^l} = \delta_j^l$ (BP3)</p>
+<p>目标函数对权重$w$求导结果：$\frac{\Phi C}{\Phi w_{jk}^l} = a_k^{l-1}\delta_j^l$ (BP4)</p>
+<p>当使用不同的损失函数时，都可以使用上述4个公式进行求解，不同之处在于$\delta^L$求解时，$\frac{\Phi C}{\Phi a^L}$不同而已。如假定使用均方误差目标函数： $C = \frac{1}{2}\sum_j(y_j-a_j^L)^2$，则$\delta^L = \frac{\Phi C}{\Phi a^L} ⊙ \sigma’(z^L) = (a^L - y) ⊙ \sigma’(z^L)$</p>
+<p>算法描述如下：</p>
+<ol>
+<li><p>输入样本$x$, 设置第一层神经元输出$a^1$为原始特征值</p>
+</li>
+<li><p>前向过程：对于$l = 2, 3, … , L$依次计算后续每层输出，$z^l = w^l a^{l-1} + b^l$, $a^l= \sigma(z^l)$</p>
+</li>
+<li><p>计算输出层误差：$\delta^L = \frac{\Phi C}{\Phi a^L} ⊙ \sigma’(z^L)$</p>
+</li>
+<li><p>误差反向传播：对于$l = L - 1, L - 2, … , 2$ 依次计算每层误差$\delta^l = ((w^{(l+1)})^T\delta ^ {l+1}) ⊙ \sigma’(z^l)$</p>
+</li>
+<li><p>计算和更新每个参数的梯度：</p>
+<p>$\frac{\Phi C}{\Phi w_{jk}^l} = a_k^{l-1}\delta_j^l$ ， </p>
+<p>$\frac{\Phi C}{\Phi b_j^l} = \delta_j^l$， </p>
+<p>$w_{jk}^l = w_{jk}^l - \eta \frac{\Phi C}{\Phi w_{jk}^l}$</p>
+<p>$b_j^l = b_j^l - \eta \frac{\Phi C}{\Phi b_j^l}$</p>
+</li>
+</ol>
+<p>BP求解算法看起来很复杂，那么为什么我们不通过梯度的定义进行求解$\frac{\Phi C}{\Phi w_j} = \frac{C(w+\varepsilon e_j) - C(w)}{\varepsilon}$，依然采用BP求解算法进行求解呢？这个问题请参考文章最后部分<strong>问题6</strong></p>
+<h2 id="神经网络训练的一些技巧"><a href="#神经网络训练的一些技巧" class="headerlink" title="神经网络训练的一些技巧"></a>神经网络训练的一些技巧</h2><p>如果直接按照误差反向传播的方式进行学习，可能会存在收敛速度慢等相关问题。本章节针对这些问题，提出一些改进方案。</p>
+<p><strong>交叉熵目标函数</strong></p>
+<p>为描述方便，我们假定有如下神经网络，该网络由一个神经元组成。</p>
+<p><img src="/2017/04/18/neuralnetwork/single_unit_network.png" alt="“单个神经元神经网络”"> </p>
+<p>$\frac{\Phi C}{\Phi w_j} = \frac{1}{2n}\sum_x \frac{\Phi C}{\Phi a} \sigma’(z)x_j$ (7)</p>
+<p>$\frac{\Phi C}{\Phi b} = \frac{1}{2n}\sum_x \frac{\Phi C}{\Phi a} \sigma’(z)$ (8)</p>
+<p><strong>采用均方误差作为损失函数，有可能会出现学习速率较慢的问题</strong>,分析如下：</p>
+<p>损失函数：$C = (y-a)^2$</p>
+<p>$\frac{\Phi C}{\Phi w_j} = \frac{1}{n}\sum_x(a-y)\sigma’(z)x_j$ (9)</p>
+<p>$\frac{\Phi C}{\Phi b} = \frac{1}{n}\sum_x(a-y)\sigma’(z)$ (10)</p>
+<p>由公式5、公式6可以得知，当学习速率比较慢时，是因为参数$w$和$b$导数值较小引起,进一步根据公式9、公式10可以得知，当$\sigma’(z)$较小时，会导致参数$w$和$b$的导数较小。而$\sigma$的图像如下图所示, 当函数值接近0或1时，$\sigma’(z)$趋近于0，会导致神经网络的学习速率非常慢.</p>
+<p><img src="/2017/04/18/neuralnetwork/sigmod_function.png" alt="“单个神经元神经网络”"> </p>
+<p><strong>采用交叉熵为损失函数，可以一定程度上解决学习速率较慢的问题</strong>,分析如下：</p>
+<p>由公式4，我们得知，交叉熵损失函数为：$C = - \frac{1}{n}\sum_x[y\ln a+(1-y)\ln (1-a)]$</p>
+<p>$\frac{\Phi C}{\Phi w_j} = -\frac{1}{n}\sum_x(\frac{y}{\sigma(z)} + \frac{y-1}{1-\sigma(z)})\sigma’(z)x_j=-\frac{1}{n}\sum_x(y-\sigma(z))x_j$ (11)</p>
+<p>$\frac{\Phi C}{\Phi b} = -\frac{1}{n}\sum_x(\frac{y}{\sigma(z)} + \frac{y-1}{1-\sigma(z)})\sigma’(z)=-\frac{1}{n}\sum_x(y-\sigma(z))$ (12)</p>
+<p>在公式11和公式12的推导过程中，我们利用了$\sigma’(z)=\sigma(z)(1-\sigma(z))$,此处不再详细推导。通过公式11和公式12，可以得知，交叉熵作为损失函数时，其对参数$w$和$b$导数值不再受$\sigma’(z)$影响,可以一定程度上解决学习速率较慢的问题。</p>
+<p>当扩展到多个神经元时，损失函数为：$C = - \frac{1}{n}\sum_x\sum_j[y_j\ln a_j+(1-y_j)\ln (1-a_j)]$(13)</p>
+<p>损失函数对$w_{kj}^L$求导，结果如下：</p>
+<p>$\frac{\Phi C}{\Phi w_{kj}^L} = -\frac{1}{n}\sum_x(\frac{y_j}{\sigma(z_j^L)} + \frac{y_j-1}{1-\sigma(z_j^L)})\sigma’(z_j^L)a_{k}^{L-1}=-\frac{1}{n}\sum_x(y_j-\sigma(z_j^L))a_{k}^{L-1}$ (14)</p>
+<p>损失函数对$b_{j}^L$求导，结果如下：</p>
+<p>$\frac{\Phi C}{\Phi b_j^L} = -\frac{1}{n}\sum_x(\frac{y_j}{\sigma(z_j^L)} + \frac{y_j-1}{1-\sigma(z_j^L)})\sigma’(z_j^L)=-\frac{1}{n}\sum_x(y_j-\sigma(z_j^L))$ (15)</p>
+<p>通过公式14和公式15可知，在输出层存在多个神经元时，利用交叉熵作为损失函数，同样可以减轻$\sigma’(z)$带来的学习速率较慢问题。</p>
+<p>相对于均方误差损失函数，交叉熵可以减轻学习速率较慢问题，那么我们在选择损失函数时，应该什么时候使用均方误差，什么时候使用交叉熵呢？具体可以参考文章最后部分<strong>问题7</strong></p>
+<p>我们是如何知道交叉熵可以减轻学习速率较慢的问题的？ 交叉熵的意义是什么？可以参考文章最后部分<strong>问题8</strong>和<strong>问题9</strong></p>
+<p><strong>Softmax</strong></p>
+<p>Softmax重新定义输出层激活函数，将输出层的激活函数用如下函数代替，其中分母对所有神经元对应值求和：</p>
+<p>$a_j^L=\frac{e^{z_j^L}}{\sum_k e^{z_k^L}}$ （16）</p>
+<p>由上述公式可知，$\sum_k a_j^L = \frac{\sum_j e^{z_j^L}}{\sum_k e^{z_k^L}} = 1$， 由于所有神经元的输出之和为1，且每个值都是正数，可以构成概率分布。当其中一个神经元的最终输出增加时，其他神经元的输出值相应的减少；反之，其他神经元的输出增加。</p>
+<p><strong>softmax输出结合log似然损失函数，可用来解决学习缓慢问题</strong>，分析如下：</p>
+<p>定义损失函数：$C = - ln(a_y^L)$, 其中$y$是对应期望输出的神经元序号，如输入图片为6, 则损失函数为$- ln(a_6^L$).</p>
+<p>$\frac{\Phi C}{\Phi b_j^L} = \frac{\Phi C}{\Phi a_j^L} \frac{\Phi a_j^L}{\Phi z_j^L} \frac{\Phi z_j^L}{\Phi b_j^L}= (-\frac{1}{a_j^L}) * (a_j^L(1-a_j^L)) * 1 = a_j^L - 1 = a_j^L - y_j$（17）</p>
+<p>同理<br>$\frac{\Phi C}{\Phi a_{jk}^L} = a_k^{L-1}(a_j^L - y_j)$（18）</p>
+<p>实际使用时，<strong>softmax函数+log似然损失函数与sigmoid函数+交叉熵都能取得不错的结果</strong>。一种通用的观点是，当我们<strong>要建模的结果符合概率分布时，适合用softmax激励函数+log似然损失函数</strong></p>
+<p><strong>过拟合与正则化</strong></p>
+<p>所谓<strong>过拟合现象</strong>，就是学习到的模型在训练集上表现很好，在测试集上效果较差。导致过拟合的原因就是因为模型过度学习，将随机噪声带来的影响也当作是样本的内在规律。当模型比较复杂（如参数较多，参数值较大）时，比较容易产生过拟合现象。由于神经网络中的参数众多，过拟合是神经网络中的一个主要问题。</p>
+<p><strong>过拟合及解决方法</strong></p>
+<ol>
+<li><p>early stopping</p>
+<p> 导致过拟合的原因之一，就是模型过渡学习。针对这种情，常用的方法是early stopping. 可通过在训练模型的同时，在验证集上观察效果，当模型在训练集上效果持续变好，但是在验证集上效果不再有显著提升时，就产生了过拟合现象，此时需要终止模型学习。通过验证集调整参数，并最终在测试集上测试，将测试集上的效果作为模型的效果指标，比直接在测试集上调整参数和验证效果更具说服力,这种参数调优方式叫做hold out.</p>
+</li>
+<li><p>增加训练样本数</p>
+<p>增加训练样本有助于减轻过拟合，但是增加训练样本的成本比较大，不容易获取更多的标注样本。因此一种常用的方法在原始样本基础上做变换（图像放射变换、语音加入噪声等，语音加速、语音减速等）。</p>
+</li>
+<li><p>用更加简单的网络结构</p>
+<p>更简单的网络结构，虽然不容易导致过拟合，其表达能力也更有限，往往效果并不很理想。</p>
+</li>
+<li><p>regularization</p>
+<p><strong>$l2$正则</strong></p>
+<p>在原始目标函数中增加正则项系数: $C = C_0 + \frac{\lambda}{2n}\sum_w w^2$. 其中$C_0$表示原始损失函数（如交叉熵、均方误差、log似然损失等），$\frac{\lambda}{2n}\sum_w w^2$是正则项。通过正则项，模型更倾向于学习更小的参数权重，降低模型的复杂度。基于L2正则的权重更新公式如下所示：</p>
+<p>$\frac{\Phi C}{\Phi w} = \frac{\Phi C_0}{\Phi w} + \frac{\eta\lambda}{n}w$（19）</p>
+<p>$\frac{\Phi C}{\Phi b} = \frac{\Phi C_0}{\Phi b}$（20）</p>
+<p>$ w = w - \eta \frac{\Phi C_0}{\Phi w} - \frac{\eta\lambda}{n}w = (1 - \frac{\eta\lambda}{n})w - \eta \frac{\Phi C_0}{\Phi w}$（21）</p>
+<p>$b = b - \eta \frac{\Phi C_0}{\Phi b}$（22）</p>
+<p>正则化不仅可以减少过拟合、提升模型效果，而且训练更稳定，更容易获得可复制结果。其原因在于：当不进行正则化时，权重向量的长度可能会逐渐变的很大，此时，虽然模型依然在继续寻找更好的方向，但是由于每次的迭代只能使得梯度有较小的变化，较难使得梯度在原来方向发上较大改变，因此模型的结果非常依赖于样本的顺序，较难找到一个更好更稳定的解。</p>
+<p>我们应该用更佳复杂的模型，还是用更加简单模型？有一种观点认为，在研究中，我们应尽量使用简单的模型和解释，除非不得不采用更复杂的模型。而正则化则有助于我们学到更佳简单的模型。</p>
+<p>为什么正则化可以防止过拟合，具有更好的泛化性能呢？正则化有助于学习更小的权重，权重较小时的一个好处是，当输入特征含有噪声时对结果影响不大，因此能够学习到更本质的东西。如果没有正则化，权重的长度较大，则即使轻微的噪声，都会对输出结果带来较大的影响。因此，正则化通过使用更小的权重参数，使得学到的模型更简单，规避了噪声带来的干扰，具有更好的泛化能力。</p>
+<p>为什么不需要对偏差参数$b$进行正则化？因为偏差参数的大小，并不会使得神经元的输出对输入特征敏感。而较大的偏差参数，可以使得我们的模型更灵活。有时候，我们也需要利用较大的偏差，使得模型能够更快收敛。</p>
+<p><strong>l1正则</strong></p>
+<p>$l1$正则的目标函数为:$C = C_0 + \frac{\lambda}{n}\sum_w|w|$, 其中$C_0$为原始目标函数，$\frac{\lambda}{n}\sum_w|w|$为正则项。</p>
+<p>$\frac{\Phi C}{\Phi w} = \frac{\Phi C_0}{\Phi w} + \frac{\eta\lambda}{n}sgn(w)$（23）</p>
+<p>$ w = w - \eta \frac{\Phi C_0}{\Phi w} - \frac{\eta\lambda}{n}sgn(w) = w - \frac{\eta\lambda}{n}sgn(w) - \eta \frac{\Phi C_0}{\Phi w}$（24）</p>
+<p>由上述公式可以得知，$l1和l2$正则项都倾向于选择较小的权重，不同之处在于$l2$正则每次都是通过将自身值乘以一定的比例因子实现，$l1$正则每次则将权重减少一个绝对值$\frac{\eta\lambda}{n}sgn(w)$, 因此当权重比较大时，$l2$正则减少的速度远远大于$l1$正则, 当权重较小时，$l1$正则减少速度远远大于$l2$正则. $l1$正则更倾向于选择个别关联度比较大的权重，其他权重会逐渐趋向于0。</p>
+<p>一个值得注意的点是，当$w$为0时，由于$|w|$不可导，我们对目标函数的处理按照非正则化的方式，认为  $\frac{\Phi C}{\Phi w} = \frac{\Phi C_0}{\Phi w} $.</p>
+<p><strong>dropout</strong></p>
+<p>相对于$l1$和$l2$正则，dropout的方式描述如下：</p>
+<ul>
+<li><p>随机删除比例为$\alpha$的隐藏层节点（如$\alpha=0.5$）</p>
+</li>
+<li><p>采用minibatch的方式，进行bp算法训练，更新网络权重</p>
+</li>
+<li><p>重复上述2个步骤，直到收敛</p>
+</li>
+<li><p>恢复所有隐藏层节点，并将训练得到的隐藏层节点相关联的权重乘以比例因子$\alpha$。</p>
+</li>
+</ul>
+<p>为什么dropout 可以减少过拟合？可以参考文章最后部分<strong>问题10</strong>.</p>
+</li>
+<li><p>权重初始化  </p>
+<p>通过交叉熵+sigmoid函数或log似然+softmax函数，可以解决输出层的权值学习速率较慢问题，但是隐含层的权值学习也存在速率较慢问题。</p>
+<p>假如我们有1000个输入层神经元，输入层有500个输入特征值为1，500个为0.每个输入层神经元到隐含神经元的权重初始化都基于正态分布（均值为0，方差为1），此时隐含层神经元的加权整合结果$z=\sum_jw_jx_j + b$， 由方差性质可知，z服从正态分布，且均值为0，方差为$\sqrt{501} = 22.4$，如下图所示，此时很大概率上，z的绝对值会远远大于1，导致隐藏神经元的输出结果会接近1或0. 此时输入特征的变化，只能使得隐藏层神经元的输出结果有轻微变化，进一步使得整个网络的变化较小，通过梯度下降方法进行参数学习时，学习速率比较慢。</p>
+<p><img src="/2017/04/18/neuralnetwork/norm_distribution.png" alt="“正态分布均均值0_标准差22.4”"> </p>
+<p>改进的方式是在初始化权重时，采用均值为0，标准差为$\frac{1}{\sqrt{n_{in}}}$的正态分布进行随机初始化, $b$采用均值为0标准差为1的正态分布随机初始化。对于上述网络，此时$z=\sum_jw_jx_j + b$服从的正态分布均值为0，标准差为$\sqrt{\frac{3}{2}}=1.22$, 此时$z$的分布情况如下图所示。由于$z$的取值大概率上会获得较小的取值，隐藏层神经元的输出结果不会接近1或0，避免了因隐藏层神经元饱和导致的学习速率慢的问题。</p>
+<p><img src="/2017/04/18/neuralnetwork/norm_distribution2.png" alt="“正态分布均均值0_标准差22.4”"> </p>
+<p>实际的经验表明，通过合理的权重初始化，大部分情况下影响网络的学习速度，如果训练次数足够多，整体上的准确性影响不是太大。但是在有些情况下，模型的准确性也会有提升。</p>
+</li>
+</ol>
+<p><strong>Momentum-based梯度下降</strong>  </p>
+<p>  在更新梯度的时候，考虑动量因素。学习方法如下所示，其中$v$表示动量的更新，$u$表示摩擦力导致动量衰减的系数。</p>
+<p>  $ v^{n+1} = uv^{n} - \eta C’$ （25）</p>
+<p>  $ w^{n+1} = w^{n} + v^{n+1}$ （26）</p>
+<p><strong>神经网络参数选择的一些技巧</strong></p>
+<p>  除了要学习的参数$w, b$之外，学习率$\eta$, 正则化参数$\lambda$, 神经网络结构，神经元个数等这些参数该如何设置？当我们面临要去解决一个完全未知的问题时，参数的设置一个非常困难的问题，有一些启发式的策略可供参考。</p>
+<ul>
+<li><p>broad strategy</p>
+<p> 用更小的成本，更快的反馈时间，去寻找参数和网络结构。如多类预测问题先用二分类问题去实验，增加监控的频率，使用更少的验证集合来逐步学习各个参数。</p>
+</li>
+<li><p>学习率$\eta$</p>
+<p> 可以先随机选择一个值，如果在前几步迭代过程中发现cost变大，则逐步减小学习率；如果cost变小则逐步增大学习率，找到学习率的上限。当学习率小于这个上限时，可以保证每次更新的步长不算太大，误差函数值不断减小。此时，选择一个比该步长上限小的值的作为学习率。</p>
+<p> 很多时候，我们期待在训练刚开始的时候，学习率尽量大，有助于快速到达最优点附近。随着训练次数的增多，逐步减少学习率，防止错过最优值。如常见的Adagrad方法, 随着迭代次数的增多，学习率逐渐减少，该方法的学习率计算方式为：$\eta_w = \frac{\eta}{\sqrt{\sum_i^t(g_i)^2}}$。</p>
+</li>
+<li><p>训练次数</p>
+<p> 在训练模型同时，采用early stopping的方式，根据验证集评估模型效果，如果一定的训练次数之后效果并没有明显提升，则停止训练。</p>
+</li>
+<li><p>正则化参数$\lambda$</p>
+<p> 先将$\lambda$参数设置为0，学习$\eta$参数，然后再学习$\lambda$，等$\lambda$参数学好之后，再回头重新优化$\eta$参数。</p>
+</li>
+<li><p>minibatch 尺寸</p>
+<p>当minibatch尺寸为1，即在线学习时，模型可能会抖动，但不是很严重的问题，因为我们的模型只要保证误差是逐步减小的就可以，而不要求完全精确。但是在线学习的一个劣势是不能充分利用并行计算的好处。如果尺寸偏小，则不能充分利用并行化的优势，如果尺寸偏大，则更新频率较低。因此，选择的目标是学习的速度尽量快。可以先学习其他参数至效果达到一定程度，然后再调整minibatch尺寸，调整好mintbathch尺寸之后，再学习其它参数。 </p>
+</li>
+</ul>
+<h2 id="深度学习"><a href="#深度学习" class="headerlink" title="深度学习"></a>深度学习</h2><p>深度学习是指用深层的结构解决机器学习相关问题，目前最主要的是每层都采用神经网络结构。也有采用其它非神经网络的深度结构，如【2】采用多层随机森林结构。 </p>
+<p><strong>浅层神经网络通过增加神经元个数，也可以拟合任何复杂的函数</strong>，但是由于层数较少，每层需要承担的功能相对较多，如在图像识别领域，如果只用一层，则需要直接建模像素和物体之间的关系。而<strong>深层网络则将每层的功能进行更详细的分工</strong>，如对于图像识别，第一层只负责边缘检测，用于学习像素和边缘之间的关系，第二层负责部件检测，用于建模边缘和部件之间的关系，第三层负责更高维度的部件，用于建模底层部件和高层部件之间的关系，依次类推，最底层用于检测最终的目标。<strong>相对于浅层网络，对同样复杂的问题建模，深层网络使得每层的功能相对简单。当网络复杂度相同时，深层网络的表征能力更强。</strong></p>
+<p><strong>梯度消失与梯度爆炸</strong></p>
+<p>当我们直接使用BP算法拟合深层神经网络，经常遇到的状况是：随着神经网络层数的增加，模型效果开始逐渐变好，之后又逐渐变差。开始效果逐渐变好，原因在于层数的增加使得神经网络的表征能力逐渐增强。而逐渐变差则是由于深层网络学习中的<strong>梯度消失</strong>或<strong>梯度爆炸</strong>问题</p>
+<p><strong>梯度消失</strong>是指深度神经网络在使用BP算法进行参数学习时，距离输出层越远，梯度的学习速度越慢，导致最远离输出层的神经网络参数学习非常慢。<strong>梯度爆炸</strong>是指深度神经网络在使用BP算法进行参数学习时，距离输出层越远，梯度的学习速度越快，导致最远离输出层的神经网络参数学习非常快。</p>
+<p>为说明梯度消失和梯度爆炸问题，我们以下图为例，共包含三个隐藏层，每个层次一个神经元，输入和输出层神经元个数也都是1. 激励函数采用$\delta(z_j)$, $\delta$是sigmoid函数。激活函数$z_j=w_ja_{j-1}+b_j$， $C$是损失函数，则</p>
+<p>$\frac{\Phi C}{\Phi b_1}=\delta’(z_1).w_2.\delta’(z_2).w_3\delta’(z_3).w_4\delta’(z_4).\frac{\Phi C}{\Phi a_4}$（27）</p>
+<p>$\frac{\Phi C}{\Phi w_1}=x.\    delta’(z_1).w_2.\delta’(z_2).w_3\delta’(z_3).w_4\delta’(z_4).\frac{\Phi C}{\Phi a_4}$（28）</p>
+<p>   <img src="/2017/04/18/neuralnetwork/multi_layer_single_neural_network.png" alt="“深度单神经元神经网络”"> </p>
+<p>sigmoid函数导数如下图所示，其中最大值为$\delta’(0)=\frac{1}{4}$.当我们使用均值为0， 方差为1的高斯分布随机生成$w$时，一般情况下$|w_j| &lt; 1$, $|w_j\delta’(z_j)| &lt; \frac{1}{4}$. 此时，神经网络距离输出层每远一层，则对应的导数减少至原来的$\frac{1}{4}$以下，指数级衰减，这样会导致梯度消失问题。</p>
+<p>在参数学习过程中，如果每个$|w_j\delta’(z_j)|&gt;1$， 由于梯度随着到输出层的距离指数增长，会导致梯度爆炸问题。</p>
+<p>   <img src="/2017/04/18/neuralnetwork/derivative_of_sigmoid_function.png" alt="“sigmoid函数导数”"> </p>
+<h3 id="卷积神经网络CNN"><a href="#卷积神经网络CNN" class="headerlink" title="卷积神经网络CNN"></a>卷积神经网络CNN</h3><p>相对于全链接的前向网络，CNN充分利用了空间相关的局部特征， 大大减少了参数数量，在图片识别领域有非常好的效果。卷积神经网络有三个重要概念：局部表示域、共享权重，pooling </p>
+<p><strong>局部表示域</strong></p>
+<p>隐藏层的每个神经元都和前一层部分神经元相连。我们以手写字识别为例，假设图片尺寸为$28×28$，其中每个像素对应一个输入层的神经元。采用$5×5$的滤波器，在字符图片上滑动，每滑动一个位置，对应一个隐含层的神经元，该位置上对应的所有像素值为对应的输入层神经元。如下图所示，由于滤波器共存在$24×24$个位置，因此对应$24×24$个神经元。实际使用时，滤波器每次挪动的位置不一定是1，因此得到的隐藏层神经元个数可能更少。</p>
+<p>   <img src="/2017/04/18/neuralnetwork/cnn_image.png" alt="“cnn图片”"> </p>
+<p><strong>共享权重</strong></p>
+<p>对于上述$24×24$个隐藏层神经元，共享同样的权重和偏差项，如式27所示。</p>
+<p>$output_{j,k} = \delta(b + \sum_{l=0}^4\sum_{m=0}^4w_{l,m}a_{j+l,k+m})$</p>
+<p>其中$\delta$是激励函数，$b$是共享偏差，$w_{l,m}$是共享权重，$a_{j+l,k+m}$是输入值。隐藏层神经元的共享权重，意味着不同的隐藏神经元检测不同位置的相同feature信息,如图像不同位置的边缘信息. </p>
+<p>由于上述原因，我们又将输入层到隐藏层到映射叫做feature map, 权重叫作共享权重，偏差叫作共享偏差。在实际应用中，为获得更好的检测效果，一般要用到多个feature map, 如下图所示.</p>
+<p>   <img src="/2017/04/18/neuralnetwork/multi_feaure_map.png" alt="“cnn图片”"> </p>
+<p>使用共享权重和偏差的一个很大好处是，可以大大减少模型参数的数量。如上例，对于$28×28$图片，使用30个隐藏层神经元，参数全连接网络参数个数为$784×30+30=23550$, 如果采用共享权重，则参数个数为$(25 + 1)×20=520$个参数，参数个数为原来的$2.2\%$.</p>
+<p><strong>pooling</strong>     </p>
+<p> pooling作用于卷积层之后，通过作用于一个卷积层之后的一些神经元，提供一个更加紧密的feature map. 如max-pooling, 作用于一个$n×n$的区域，输出最大的卷积层神经元输出。如下图所示，对于$2×2$的卷积层输出进行max-pooling。在对$24×24$进行max-pooling之后，神经元的个数减少为$12×12$.</p>
+<p>   <img src="/2017/04/18/neuralnetwork/max-pooling.png" alt="“max-pooling”"> </p>
+<p> 由于卷积层存在多个feature map, 我们需要对每个feature map进行max-pooling。 对3个feature map进行max-pooling的输出如下所示：</p>
+<p>   <img src="/2017/04/18/neuralnetwork/multi_max_pooling.png" alt="“multi_max_pooling”"> </p>
+<p>除了max-pooling之外，也可以使用其它的pooling方式，如采用L2 pooling, 计算方式是对一个对卷积层的输出求平方和之后进行开方。具体使用哪种方式，取决于我们的应用数据，可通过验证集上的效果来决定。</p>
+<p><strong>cnn用于分类</strong>   </p>
+<p>经过pooling层之后，通过加入全连接层实现分类。如字符识别，在最后加入10个输出神经元，并让pooling层的输出和这10个神经元进行全连接，如下图所示：</p>
+<p>   <img src="/2017/04/18/neuralnetwork/cnn_architecture.png" alt="“cnn_architecture”"> </p>
+<p> 实际使用时，往往需要多层的卷积和pooling层。我们需要在下一层做卷积的时候，每个局部表示域作用于上一层每个feature map的所有pooling输出,得到每个feature map所有局部表示特征。</p>
+<p> cnn在训练的时候，有哪些技巧可提升效果？</p>
+<ul>
+<li><p>rectified linear units</p>
+<p>在【1】的cnn实验中，通过将激活函数simoid函数替换为relu, 往往可以获得更好的分类效果。激活函数表达如下：$f(z)=max(0, z)$</p>
+</li>
+<li><p>Expanding the training data**   </p>
+<p>对字符图片扩展训练数据，【1】将像素位置全部平移的方式，获得更多的训练集，可进一步提升分类效果。虽然cnn是对物体位置鲁棒的，但是通过平移，多个feature map变换，对图像做任何合理的变换，都可以增加样本的多样性，有助于分类效果的提升。</p>
+</li>
+<li><p>加入一层全连接接层，并使用drop out</p>
+<p>通直接加入一层全连接，可以增加模型的灵活性，但是可能出现过拟合，再利用drop out可以减少过拟合问题，提升模型的效果。对于卷积层，不太需要使用drop out, 因为卷积层采用共享权重，从整个图片中学习共享权重，不太容易受局部噪声的干扰。</p>
+</li>
+<li><p>模型组合</p>
+<p>由于每次初始化都是随机赋予神经网络权值，每次学到的模型参数可能不同。通过训练多个神经网络，最后综合多个神经网络的效果，能够减少单个神经网络的偏差，获得更好的效果。</p>
+</li>
+</ul>
+<p><strong>cnn如何规避梯度消失（爆炸）问题</strong></p>
+<p>cnn没有规避梯度消失（爆炸）问题，是采用了一些技巧使得深度学习可以进行。</p>
+<ul>
+<li><p>使用cnn大大减少了参数的数量，网络学习更加容易</p>
+</li>
+<li><p>使用正则化技术，如drop out</p>
+</li>
+<li><p>使用relu激励函数代替sigmoidh函数</p>
+</li>
+<li><p>更长时间的训练</p>
+<p>另外，为提升训练效果，可以采用更大的训练集提升效果，使用更好的权重初始化方法等等。</p>
+</li>
+</ul>
+<h1 id="问题与思考"><a href="#问题与思考" class="headerlink" title="问题与思考"></a>问题与思考</h1><ol>
+<li><p><strong>如数字识别，输出神经元个数为什么是10，而不是4（用4个比特位可以表示16个类别，满足大于等于10的要求）？</strong></p>
+<p>如果输出神经元个数是10，则每个神经元的只需要实现判断自身的输出是否为一个特定数字，每个输出神经元只需要建模原始数据特征是否和某个数字匹配。而如果输出神经元个数为4，则每个输出神经元需要建模每个比特位值和特征之间的关系，而每个比特位和字符的形状特征之间的关系要更加复杂，学习起来更加困难。因此，输出神经元个数为10要好于神经元个数为4的效果.</p>
+</li>
+<li><p><strong>为什么损失函数用MSE或者交叉熵等函数，而不是最小化错误样本个数？</strong></p>
+<p> 错误样本个数虽然可以描述模型效果，但不是平滑函数，对权重和偏差参数轻微改变不能保证分类错误的样本个数有变化，因此通过梯度下降等方式无法求解。而MSE或者交叉熵函数作为目标函数时，对权重和偏差做轻微改变，对应的目标函数也会有轻微改变。因此，最小化MSE或者交叉熵作为目标函数，方便通过梯度下降方法进行优化求解。</p>
+</li>
+<li><p><strong>为什么不通过分析等方法，直接求解最优值，而是利用梯度下降？</strong></p>
+<p> 当变量较少的时候，可以通过分析的方式，如对每个变量求导，令导数等于0求得最优解。但是当参数非常多且有很复杂关系的时候，求解会非常的困难。对于神经网络模型，为了更好的模型表达，我们往往有非常多的网络参数，关系也比较复杂，此时通过分析方式求解会非常困难，而通过梯度下降，相对比较容易求解。    </p>
+</li>
+<li><p><strong>为什么在梯度方向而非其他方向更新参数？</strong></p>
+<p>根据微积分，我们知道，函数值的变化可以用公式Q1进行表示。其中$\Delta C$表示函数值的微小变化，$\Delta w$表示权重的微小变化，$\frac{\alpha C}{\alpha w}$表示误差函数对权重求导。</p>
+<p>$\Delta C = \frac{\alpha C}{\alpha w} \Delta w （Q1）$</p>
+<p>当$\Delta w = -\eta \frac{\alpha C}{\alpha w} $时，$\Delta C = -（\frac{\alpha C}{\alpha w})^2 &lt;= 0$, 这样保证每次迭代后损失函数有所减小。因此，通过在梯度方向更新参数$w=w-\eta\frac{\alpha C}{\alpha w}$，可以不断减少损失函数的值。实际使用时，如果$\eta$太大，可能会错过极小值，如果过小，迭代速度会非常慢，因此选择合适的$\eta$值很重要。可通过开始时设置较大的值更快地到达极小值附近，然后逐步减小$\eta$的值，防止在迭代时错过最小值。</p>
+<p>根据公式$Q1$，如果$||\Delta w||=\varepsilon $, 即固定步长为$\varepsilon$，当权重更新方向和梯度方向完全相反时，由几何知识（向量在自身方向的投影长度最大）可以得知，损失函数值的减少是最多的。</p>
+</li>
+<li><p><strong>除了梯度下降，还有其他哪些求解相关方法？</strong></p>
+<p>除了梯度法，在求解最优化问题时，针对具体的应用场景，还有牛顿法、拟牛顿法、LBFGS等相关求解方法。但是，由于该类方法，在求解时需要用到二阶导数，而在参数数量比较多的时候，二阶导数的时间复杂度是非常高。又由于神经网络通过使用梯度下降往往可以获得较好的效果，同时又具有较多参数，因此在神经网络中的求解时，一半使用梯度下降方法。</p>
+</li>
+<li><p><strong>和根据梯度定义直接求解梯度相比，BP网络训练速度怎样？为什么？</strong></p>
+<p>根据梯度定义求解梯度的公式如下，其中$\varepsilon$是很小的正数， $e_j$是第j个方向的单位向量。</p>
+<p>$\frac{\Phi C}{\Phi w_j} = \frac{C(w+\varepsilon e_j) - C(w)}{\varepsilon}$</p>
+<p>直接通过梯度定义求解，虽然看起来求解公式比较简单，但是当参数非常多的时候，每个样本都需要经过一次前向过程，才能得到一个参数的梯度，而BP反向传播的方式，虽然看起来求解公式比较复杂，但是每个样本的一次前向过程，可以得到所有参数的梯度。因此，相对于直接根据梯度下降求解，该方法大大提升了训练的效率。但是，bp网络求解在求解深度网络时，由于要面临梯度消失、梯度爆炸等相关问题，依然有很大的局限性。  </p>
+</li>
+<li><p><strong>在训练神经网络时，误差函数什么时候选择均方误差，什么时候选择交叉熵？</strong></p>
+<p> <strong>当输出层神经元使用sigmoid函数的时候，使用交叉熵作为损失函数是比较好的</strong>。因为我们往往通过随机的方式初始化神经网络权重和偏差，如果使用均方误差作为损失函数，有可能在并没有接近收敛的时候，权重的更新速度也非常慢，而采用交叉熵的方式则可以减轻这种问题。</p>
+<p> <strong>当输出层神经元使用线性函数的时候</strong>，使用均方误差作为损失函数，不会导致训练速度较慢的问题，而使用交叉熵作为损失函数，会导致在模型本该收敛的时候，梯度更新反而变快，不利于训练及时结束。因此，<strong>可以选择使用均方误差作为损失函数</strong>。</p>
+</li>
+<li><p><strong>我们是如何知道交叉熵可以减轻学习速率较慢的问题的？</strong>    </p>
+<p>从公式9和公式10，我们知道均方误差之所以会导致学习速率较慢，是因为$\sigma’(z)$ 的存在会导致学习率较慢的问题，比较理想的，我们先假设有损失函数在对参数求导时，可以将$\sigma’(z)$去掉，就可以避免这个问题。如下所示：</p>
+<p>$\frac{\Phi C}{\Phi w_j} = x_j(a-y)$ (Q2)</p>
+<p>$\frac{\Phi C}{\Phi b} = a-y$ (Q3)</p>
+<p>同时，也满足如下公式：</p>
+<p>   $\frac{\Phi C}{\Phi w_j} = \frac{\Phi C}{\Phi a} \sigma’(z)x_j$ (Q4)</p>
+<p>   $\frac{\Phi C}{\Phi b} = \frac{\Phi C}{\Phi a} \sigma’(z)$ (Q5)</p>
+<p>   $\sigma’(z) = \sigma(z)(1-\sigma(z))$ (Q6)</p>
+<p>   联立Q2-Q6，可得：</p>
+<p>   $\frac{\Phi C}{\Phi a} = \frac{a-y}{a(1-a)}$ (Q7)</p>
+<p>   对Q7两边对a进行积分，可以得到:<br>   $C = -[y ln(a) + (1-y)ln(1-a)] + constant$ (Q8)</p>
+</li>
+<li><p><strong>交叉熵的意义何在？</strong>    </p>
+<ul>
+<li><p>交叉熵描述了对结果的惊奇程度。如假设样本分为两个类别，y表示lable, 取值0和1. a表示取值为y=1的概率，当交叉熵越小，表示得到的结果越符合我们的预期。</p>
+</li>
+<li><p>交叉熵实际上描述了似然概率对数的相反数。</p>
+<p>如一个神经元的输出值a描述了属于正样本的概率，样本的极大似然函数为：$a^y(1-a)^{1-y}$, 求对数并取反后结果为$-[yln(a)+(1-y)ln(1-a)]$</p>
+</li>
+</ul>
+</li>
+<li><p><strong>为什么dropout可以减少过拟合？</strong></p>
+<p>使用dropout的方式训练神经网络，由于在每次迭代过程中删除不同的节点，相当于训练多个不同的神经网络，每个网络有不同的过拟合方式，最后通过综合每个网络的预测结果，使得过拟合影响降低。</p>
+<p>一种相关的观点认为，通过每次训练时随机删除不同的节点，使得每个神经元依赖于更少的神经元输入，降低了网络结构的复杂度，每次的迭代都是在学习当有其他特征丢失时更鲁棒的参数组合。最后通过多模型融合的方式，达到更好的预测。</p>
+</li>
+<li><p><strong>除了常见的sigmoid神经元，都有哪些常见的神经元</strong></p>
+<p>除了sigmoid神经元，还有tanh神经元，RELU神经元等。</p>
+<p>tanh神经元的激活函数：$tanh(z) = \frac{(e^z-e^{-z})}{e^z+e^{-z}}$， 对应图像如下图所示。该神经元的输出值在-1到1之间，而sigmoid的输出在0-1之间。根据$\frac{\Phi C}{w_{jk}^l}=a_k^l\delta_j^{l+1}$可得知，sigmoid同一层连接到下一层某个神经元的的所有权重只能同时增加或同时减小，而tanh神经元可以让同一层连接到下一层某个神经元的权重不同时增加或减少。这个性质可能使得神经元多了一些灵活性，在一些情况下会比sigmoid神经元得到更好的效果。</p>
+<p><img src="/2017/04/18/neuralnetwork/tanh_image.png" alt="“单个神经元神经网络”"> </p>
+<p>RELU神经元的激活函数为：$RELU(z) = max(0, z)$。该函数有2个性质：相对于sigmoid或tanh神经元，该类神经元不会受饱和问题影响而减慢学习速度；当加权输入之和为负数时，因梯度消失而停止学习。</p>
+</li>
+<li><p><strong>当训练集上效果不好时，可通过哪些策略改进[1][3]</strong></p>
+<p><strong>修改损失函数和激励函数</strong></p>
+<p>一般可采用sigmoid激励函数+交叉熵算是函数， 或soft max+似然损失函数，可以减少学习速率过慢带来的影响。</p>
+<p>通过引入relu激励函数，可以减轻梯度组合和梯度爆炸问题。</p>
+<p><strong>minibatch</strong></p>
+<p>可通过mimibathch, 更新样本训练顺序，获得可能的更好的效果。</p>
+<p><strong>自适应学习率</strong></p>
+<p>如通过adagrad等方法，根据学习程度，自适应修改学习的速度。开始时通过较大的学习率很快达到极小值附近，在极小值附近通过更精确的检索，获得更好的拟合效果</p>
+<p><strong>动量方式学习参数</strong></p>
+<p>通过引入动量方式，获得更好的极小值。</p>
+</li>
+<li><p><strong>当训练集上效果很好，但验证集上效果不好，可通过哪些策略改进[1][3]</strong></p>
+<p><strong>正则化（weight decay）</strong></p>
+<p>如引入l1正则，l2正则等，减少模型等复杂度</p>
+<p><strong>drop out</strong></p>
+<p>通过在每次训练时，随机减少一定比例的神经元，在训练好之后，恢复所有神经元。该方式可以看作是，训练了多个神经网络，最后利用模型组合的方式，提升整体的模型效果。</p>
+<p><strong>增加训练样本，或通过样本变换增加训练样本</strong></p>
+<p><strong>early stoping</strong></p>
+<p>训练时引入验证集同步验证效果。当验证集合效果不再提升时，停止训练。</p>
+<p><strong>网络结构</strong></p>
+<p>通过使用相对更简单的网络结构，减少过拟合</p>
+</li>
+</ol>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1]  Michael Nielsen, “Neural Networks and Deep Learning”, 2017.01, <a href="http://neuralnetworksanddeeplearning.com/index.html" target="_blank" rel="noopener">http://neuralnetworksanddeeplearning.com/index.html</a></p>
+<p>[2] Zhi-Hua Zhou and Ji Feng, “Deep Forest: Towards An Alternative to Deep Neural Networks”, 2017</p>
+<p>[3] 李宏毅, “Deep Learning Tutorial”, <a href="https://www.slideshare.net/tw_dsconf/ss-62245351?qid=108adce3-2c3d-4758-a830-95d0a57e46bc&amp;v=&amp;b=&amp;from_search=3" target="_blank" rel="noopener">https://www.slideshare.net/tw_dsconf/ss-62245351?qid=108adce3-2c3d-4758-a830-95d0a57e46bc&amp;v=&amp;b=&amp;from_search=3</a>, 2016</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/深度学习/" rel="tag">#深度学习</a>
+          
+            <a href="/tags/神经网络/" rel="tag">#神经网络</a>
+          
+            <a href="/tags/学习总结/" rel="tag">#学习总结</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/03/16/gender_based_rs/" rel="next" title="一种基于性别的推荐方法">
+                <i class="fa fa-chevron-left"></i> 一种基于性别的推荐方法
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/05/30/qualified_model/" rel="prev" title="一种简单的优质挖掘模型">
+                一种简单的优质挖掘模型 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="lantian" />
+          <p class="site-author-name" itemprop="name">lantian</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#神经网络与深度学习"><span class="nav-number">1.</span> <span class="nav-text">神经网络与深度学习</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络相关基础"><span class="nav-number">1.1.</span> <span class="nav-text">神经网络相关基础</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BP学习算法"><span class="nav-number">1.2.</span> <span class="nav-text">BP学习算法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络训练的一些技巧"><span class="nav-number">1.3.</span> <span class="nav-text">神经网络训练的一些技巧</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#深度学习"><span class="nav-number">1.4.</span> <span class="nav-text">深度学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#卷积神经网络CNN"><span class="nav-number">1.4.1.</span> <span class="nav-text">卷积神经网络CNN</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#问题与思考"><span class="nav-number">2.</span> <span class="nav-text">问题与思考</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">3.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lantian</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+  
+  
+  
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.1.js"></script>
+  <script>AV.initialize("L0fIeSgn4Q8LXNCF4L3zEpU7-gzGzoHsz", "MKiQArcDI3O3uBaLP8MaDXw3");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            counter.save(null, {
+              success: function(counter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.get('time'));
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            var newcounter = new Counter();
+            /* Set ACL */
+            var acl = new AV.ACL();
+            acl.setPublicReadAccess(true);
+            acl.setPublicWriteAccess(true);
+            newcounter.setACL(acl);
+            /* End Set ACL */
+            newcounter.set("title", title);
+            newcounter.set("url", url);
+            newcounter.set("time", 1);
+            newcounter.save(null, {
+              success: function(newcounter) {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+              },
+              error: function(newcounter, error) {
+                console.log('Failed to create');
+              }
+            });
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+</body>
+</html>
