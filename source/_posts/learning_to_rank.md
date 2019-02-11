@@ -119,22 +119,22 @@ $m = m\_1 + m\_2 + ... + m\_l$
 
 # Pairwise
 
-基于pairwise的rank方法中，将排序问题转化为pairwise的分类或回归问题进行求解。通常情况下，针对一个query对应的document pair, 利用分类器对pair的order进行判断。常见的pairwise rank方法有rank net、rank svm等，此处以rank net为例进行说明。
+基于pairwise的rank方法中，将排序问题转化为pairwise的分类或回归问题进行求解。通常情况下，针对一个query对应的document pair, 利用分类器对pair的order进行判断。常见的pairwise rank方法有RankNet、RankSvm等，此处以RankNet为例进行说明。
 
-## rank net原理及求解
-**rank net建模**
+## RankNet原理及求解
+**RankNet建模**
 
-rank net使用的打分模型要求对参数可导，训练数据根据query分为多个组，对于1个给定的query，选择2个不同相关性label的document pair，计算相关性分数$s\_i=f(x\_i)$和$s\_j=f(x\_j)$，rank net对其对应的特征向量进行打分。$d\_i>d\_j$表示document $d\_i$的相关性大于$d\_j$。
+RankNet使用的打分模型要求对参数可导，训练数据根据query分为多个组，对于1个给定的query，选择2个不同相关性label的document pair，计算相关性分数$s\_i=f(x\_i)$和$s\_j=f(x\_j)$，RankNet对其对应的特征向量进行打分。$d\_i>d\_j$表示document $d\_i$的相关性大于$d\_j$。
 
 document $d\_i$的相关性大于document $d\_j$的概率如下:
 
 $P\_{ij}=P(d\_i>d\_j)=\frac{1}{1+e^{-\sigma (s\_i-s\_j)}}  (1)$ 
 
-其中$\sigma$是常数，决定sigmoid函数的形状。rank net采用交叉熵函数训练模型，如下所示。其中$P'\_{ij}$表示真实的$d\_i$相关性大于$d\_j$的概率。
+其中$\sigma$是常数，决定sigmoid函数的形状。RankNet采用交叉熵函数训练模型，如下所示。其中$P'\_{ij}$表示真实的$d\_i$相关性大于$d\_j$的概率。
 
-$C=-P'\_{ij}logP\_{ij}-(1-P'\_{ij})log(1-P\_{ij}))  (2)$
+$C=-P'\_{ij}logP\_{ij}-(1-P'\_{ij})log(1-P\_{ij})  (2)$
 
-**rank net求解**
+**RankNet求解**
 
 为方便后续描述，针对1个给定的query，我们定义变量$S\_{ij}$：
 
@@ -152,7 +152,17 @@ $S\_{ij} =
 
 $P'\_{ij}=\frac{1}{2}(1+S\_{ij}). (4)$
 
-由上述式2和式4的到，$C=\frac{1}{2}(1-S\_{ij})\sigma (s\_i - s\_j) + log(1+e^{-\sigma(s\_i-s\_j)}) (5)$
+由上述式2和式4可以得出：
+
+$C=-P'\_{ij}logP\_{ij}-(1-P'\_{ij})log(1-P\_{ij}) \\\\
+  = -\frac{1}{2}(1+S\_{ij})logP\_{ij}-(1-\frac{1}{2}(1+S\_{ij}))log(1-P\_{ij}) \\\\
+  = -\frac{1}{2}(logP\_{ij}+log(1-P\_{ij}))-\frac{1}{2}S\_{ij}(logP\_{ij}-log(1-P\_{ij}) \\\\
+  = -\frac{1}{2}log(P\_{ij}*(1-P\_{ij}))-\frac{1}{2}S\_{ij}log\frac{P\_{ij}}{1-P\_{ij}} \\\\ 
+  = -\frac{1}{2}log\frac{e^{-\sigma(s\_i-s\_j)}}{(1+e^{-\sigma(s\_i-s\_j)})^2} -\frac{1}{2}S\_{ij}loge^{\sigma(s\_i-s\_j)} \\\\
+  = -\frac{1}{2}(-\sigma(s\_i-s\_j)-2log(1+e^{-\sigma(s\_i-s\_j)})) -\frac{1}{2}S\_{ij}\sigma(s\_i-s\_j) \\\\
+  = \frac{1}{2}(1-S\_{ij})\sigma(s\_i-s\_j)+log(1+e^{-\sigma(s\_i-s\_j})
+(5)$
+
 
 $C =
 \begin{cases}
@@ -170,28 +180,50 @@ $w\_k=w\_k-\eta (\frac{\varphi C}{\varphi s\_i}\frac{\varphi s\_i}{\varphi w\_k}
 
 其中$\eta > 0$为学习率。
 
-**rank net求解加速**
+**RankNet求解加速**
 
 对于给定的文档对$d\_i$和$d\_j$，
 
 $ \frac{\varphi C}{\varphi w\_k}=\frac{\varphi C}{\varphi s\_i}\frac{\varphi s\_i}{w\_k}+\frac{\varphi C}{\varphi s\_j}\frac{\varphi s\_j}{\varphi w\_k} = \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}}) (\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})=\lambda\_{ij}(\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})(9)$
 
-其中$\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})$
+其中$\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})（10）$
 
 我们定义$I$为索引对$(i,j)$的集合(其中$doc\_i$的相关性大于$doc\_j$)，汇总来自所有文档对的贡献，
 
-$\delta w\_k=-\eta \sum\_{(i,j) \in I} \lambda\_{ij}(\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})=-\eta\sum\_i\lambda\_i\frac{\varphi s\_i}{\varphi w\_k}(10)$
+$\delta w\_k=-\eta \sum\_{(i,j) \in I} \lambda\_{ij}(\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})=-\eta\sum\_i\lambda\_i\frac{\varphi s\_i}{\varphi w\_k}(11)$
 
-其中$\lambda\_i = \sum\_{j:(i,j) \in I}\lambda\_{ij}-\sum\_{j:(j,i) \in I}\lambda\_{ij}$，每个document对应一个$\lambda\_i$，方向表示梯度更新的方向，大小表示梯度更新的幅度。每个$\lambda\_i$的计算都来自该document对应的所有pair。在实际计算时，可以对每个文档计算其对应的$\lambda\_i$，然后用于更新模型参数。这种mini-batch的梯度更新方式和问题分解方法，显著提升了ranknet学习的效率。
-
+其中$\lambda\_i = \sum\_{j:(i,j) \in I}\lambda\_{ij}-\sum\_{j:(j,i) \in I}\lambda\_{ij}$，每个document对应一个$\lambda\_i$，其含义为损失函数对文档$d\_i$的模型打分$s\_i$的梯度。方向表示梯度的方向，大小表示梯度的幅度。每个$\lambda\_i$的计算都来自该document对应的所有pair。在实际计算时，可以对每个文档计算其对应的$\lambda\_i$，然后用于更新模型参数。这种mini-batch的梯度更新方式和问题分解方法，显著提升了RankNet模型训练的效率。
 
 
 # Listwise
+
+基于pairwise的方法(如RankNet)优化的是pairwise误差，而在很多rank相关领域如信息检索，更加关注的是topK的排序结果。
+
+如下图所示，假定当前文档的相关性值只有0和1，灰色线表示和当前query不相关的文档，蓝色线表示和当前query相关文档，对于左图，pairwise误差为13，对于右图，将上面的相关文档下移3个位置，下面的相关文档上移5个位置，pairwise误差减少到11，而对于NDCG等更加关注top k结果的排序指标，误差可能是增加的。右图中的黑色箭头表示RankNet梯度方向，而我们更想要的是红色箭头对应的梯度方向。此时，就需要利用ListRank方法解决。
+
+<center/>
+![“pairwise and listwise”](learning_to_rank/pairwise_listwise.png) 
+</center>
+<center/>图3：pairwise和listwise误差比较[3]</center>
+
+我们以LambdaRank方法为例，对Listwise进行说明。
+
+## LambdaRank思想
+
+LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型打分的梯度，而不是直接通过计算得到，是LambdaRank的主要思路。采用这样的思路，能绕过NDCG等排序指标对模型打分求导的困难。而$lambad$值正是代表对模型打分的梯度信息，每篇文档的$lambad$都从其它所有不同label的文档处获得其对应的更新方向和更新值。
+
+对式10进行更新，乘于交换文档对$d\_i$和$d\_j$在rank列表中的位置后NDCG的变化幅度，能得到不错的结果[3]。
+
+$\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})|\triangle NDCG| (12)$
+
+经验表明，式12能直接优化NDCG指标。实际上，如果我们要优化其它指标，如MAP、MRR等，只需要更新NDCG的变化幅度为其它指标的变化幅度[3]。
+
+
+
 
 # 参考资料
 
 [1] A Short Introduction to Learning to Rank
 [2] A. Shashua and A. Levin, “Ranking with large margin prin- ciple: Two approaches,” in Advances in Neural Information Processing Systems 15, ed. S.T. S. Becker and K. Ober- mayer, MIT Press.
-
-
+[3] From RankNet to LambdaRank to LambdaMART: An Overview
  
