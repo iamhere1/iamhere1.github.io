@@ -117,11 +117,75 @@ $m = m\_1 + m\_2 + ... + m\_l$
 
 
 
-
-
-
-
 # Pairwise
+
+基于pairwise的rank方法中，将排序问题转化为pairwise的分类或回归问题进行求解。通常情况下，针对一个query对应的document pair, 利用分类器对pair的order进行判断。常见的pairwise rank方法有rank net、rank svm等，此处以rank net为例进行说明。
+
+## rank net原理及求解
+**rank net建模**
+
+rank net使用的打分模型要求对参数可导，训练数据根据query分为多个组，对于1个给定的query，选择2个不同相关性label的document pair，计算相关性分数$s\_i=f(x\_i)$和$s\_j=f(x\_j)$，rank net对其对应的特征向量进行打分。$d\_i>d\_j$表示document $d\_i$的相关性大于$d\_j$。
+
+document $d\_i$的相关性大于document $d\_j$的概率如下:
+
+$P\_{ij}=P(d\_i>d\_j)=\frac{1}{1+e^{-\sigma (s\_i-s\_j)}}  (1)$ 
+
+其中$\sigma$是常数，决定sigmoid函数的形状。rank net采用交叉熵函数训练模型，如下所示。其中$P'\_{ij}$表示真实的$d\_i$相关性大于$d\_j$的概率。
+
+$C=-P'\_{ij}logP\_{ij}-(1-P'\_{ij})log(1-P\_{ij}))  (2)$
+
+**rank net求解**
+
+为方便后续描述，针对1个给定的query，我们定义变量$S\_{ij}$：
+
+$S\_{ij} =
+\begin{cases}
+1,  & d\_i比d\_j更相关\\\\
+-1,  & d\_j比d\_i更相关\\\\
+0  & d\_i和d\_j相关性相同
+\end{cases}
+ (3)$
+
+在本文中，假定对于每个query，其对应所有document的相关性顺序都是完全确定的。
+
+因此，
+
+$P'\_{ij}=\frac{1}{2}(1+S\_{ij}). (4)$
+
+由上述式2和式4的到，$C=\frac{1}{2}(1-S\_{ij})\sigma (s\_i - s\_j) + log(1+e^{-\sigma(s\_i-s\_j)}) (5)$
+
+$C =
+\begin{cases}
+log(1+e^{-\sigma(s\_i-s\_j)}),  & 当S\_{ij}=1\\\\
+log(1+e^{-\sigma(s\_j-s\_i)}),  & 当S\_{ij}=-1
+\end{cases}
+(6)$
+
+$C$对$s$求导，结果如下：
+$ \frac{\varphi C}{\varphi s\_i}=\sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})=-\frac{\varphi C}{\varphi s\_j} (7)$
+
+通过SGD的方式进行求解
+
+$w\_k=w\_k-\eta (\frac{\varphi C}{\varphi s\_i}\frac{\varphi s\_i}{\varphi w\_k}+\frac{\varphi C}{\varphi s\_j}\frac{\varphi s\_j}{\varphi w\_k}) (8)$
+
+其中$\eta > 0$为学习率。
+
+**rank net求解加速**
+
+对于给定的文档对$d\_i$和$d\_j$，
+
+$ \frac{\varphi C}{\varphi w\_k}=\frac{\varphi C}{\varphi s\_i}\frac{\varphi s\_i}{w\_k}+\frac{\varphi C}{\varphi s\_j}\frac{\varphi s\_j}{\varphi w\_k} = \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}}) (\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})=\lambda\_{ij}(\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})(9)$
+
+其中$\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})$
+
+我们定义$I$为索引对$(i,j)$的集合(其中$doc\_i$的相关性大于$doc\_j$)，汇总来自所有文档对的贡献，
+
+$\delta w\_k=-\eta \sum\_{(i,j) \in I} \lambda\_{ij}(\frac{\varphi s\_i}{\varphi w\_k} - \frac{\varphi s\_j}{\varphi w\_k})=-\eta\sum\_i\lambda\_i\frac{\varphi s\_i}{\varphi w\_k}(10)$
+
+其中$\lambda\_i = \sum\_{j:(i,j) \in I}\lambda\_{ij}-\sum\_{j:(j,i) \in I}\lambda\_{ij}$，每个document对应一个$\lambda\_i$，方向表示梯度更新的方向，大小表示梯度更新的幅度。每个$\lambda\_i$的计算都来自该document对应的所有pair。在实际计算时，可以对每个文档计算其对应的$\lambda\_i$，然后用于更新模型参数。这种mini-batch的梯度更新方式和问题分解方法，显著提升了ranknet学习的效率。
+
+
+
 # Listwise
 
 # 参考资料
