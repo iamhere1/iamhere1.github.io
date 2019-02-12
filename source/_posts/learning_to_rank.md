@@ -216,7 +216,7 @@ LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型�
 
 $\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})|\triangle NDCG|$
 
-由于每个query对应的文档对集合I中，前一个文档的相关性大于后一个，$S\_{ij}=1$，因此，式12可以直接写成：
+由于每个query对应的文档对集合I中，前一个文档的相关性大于后一个，$S\_{ij}=1$，因此，上式可以直接写成：
 $\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \frac{-\sigma |\triangle NDCG|}{1+e^{-\sigma(s\_i-s\_j)}}) (12)$
 
 
