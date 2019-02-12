@@ -208,7 +208,7 @@ $\delta w\_k=-\eta \sum\_{(i,j) \in I} \lambda\_{ij}(\frac{\varphi s\_i}{\varphi
 
 我们以LambdaRank方法为例，对Listwise进行说明。
 
-## LambdaRank思想
+## LambdaRank
 
 LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型打分的梯度，而不是直接通过计算得到，是LambdaRank的主要思路。采用这样的思路，能绕过NDCG等排序指标对模型打分求导的困难。而$lambad$值正是代表对模型打分的梯度信息，每篇文档的$lambad$都从其它所有不同label的文档处获得其对应的更新方向和更新值。
 
@@ -216,14 +216,45 @@ LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型�
 
 $\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \sigma (\frac{1}{2}(1-S\_{ij})-\frac{1}{1+e^{-\sigma(s\_i-s\_j)}})|\triangle NDCG| (12)$
 
+由于每个query对应的文档对集合I中，前一个文档的相关性大于后一个，$S\_{ij}=1$，因此，式12可以直接写成：
+$\lambda\_{ij}=\frac{\varphi C}{\varphi s\_i}= \frac{-\sigma |\triangle NDCG|}{1+e^{-\sigma(s\_i-s\_j)}}) (12)$
+
+
 经验表明，式12能直接优化NDCG指标。实际上，如果我们要优化其它指标，如MAP、MRR等，只需要更新NDCG的变化幅度为其它指标的变化幅度[3]。
 
+## LambdaMART
+LambdaMART算法是LambdaRank和MART算法的组合。MART算法提供了算法的框架，需要用到的梯度相关信息则来自LambdaRank方法的梯度$y\_i'=\lambda\_i = \sum\_{j:(i,j) \in I}\lambda\_{ij}-\sum\_{j:(j,i) \in I}\lambda\_{ij}$
+
+为方便描述，我们引入
+$\sum\_{(i,j) \doteq I} \lambda\_{ij} = \sum\_{j:(i,j) \in I}\lambda\_{ij}-\sum\_{j:(j,i) \in I}\lambda\_{ij}$
+
+$\lambda\_i$相当于如下函数的导数：
+$C=\sum\_{(i,j) \doteq I}|\triangle NDCG\_{ij}|log(1+e^{-\sigma(s\_i-s\_j)})$
+
+$\frac{\varphi C}{\varphi s\_i}= \sum\_{(i,j) \doteq I}\frac{-\sigma |\triangle NDCG\_{ij}|}{1+e^{-\sigma(s\_i-s\_j)}})= \sum\_{(i,j) \doteq I} -\sigma |\triangle NDCG\_{ij}|\rho\_{ij}(13)$
+其中$\rho\_{ij}=\frac{1}{1+e^{-\sigma(s\_i-s\_j)}}$
+
+$\frac{\varphi^2 C}{\varphi s\_i^2}= \sum\_{(i,j) \doteq I}\sigma^2 |\triangle NDCG\_{ij}|\rho\_{ij}(1-\rho\_{ij})(14)$
+
+对于第m棵树的第k个叶子结点，其对应的值如下：
+$\gamma\_{km}=\frac{\sum\_{x\_i \in R\_{km}} \frac{\varphi C}{\varphi s\_i}}{\sum\_{x\_i \in R\_{km}} \frac{\varphi^2 C}{\varphi s\_i^2}}=\frac{-\sum\_{x\_i \in R\_{km}}\sum\_{(i,j)\doteq I}|\triangle NDCG\_{ij}|\rho\_{ij}}{\sum\_{x\_i \in R\_{km}}\sum\_{(i,j)\doteq I}|\triangle NDCG\_{ij}|\sigma\rho\_{ij}(1-\rho\_{ij})}$
+
+
+LambdaMART算法的流程如下：
+<center/>
+![“lambadMART”](learning_to_rank/lambadMART.png) 
+</center>
+<center/>图4:lambadMART算法流程[3]</center>
+
+**lambdaRank和lambadMART参数更新的不同：**
+
+前者对于每个query，计算梯度信息并更新一次参数，每次更新所有的模型参数；后者对每次分裂使用所有落在当前节点的样本及在同一group的样本，只更新当前节点的参数而非所有模型参数。
 
 
 
 # 参考资料
 
-[1] A Short Introduction to Learning to Rank
-[2] A. Shashua and A. Levin, “Ranking with large margin prin- ciple: Two approaches,” in Advances in Neural Information Processing Systems 15, ed. S.T. S. Becker and K. Ober- mayer, MIT Press.
-[3] From RankNet to LambdaRank to LambdaMART: An Overview
+[1] LI, Hang. "A Short Introduction to Learning to Rank"[J]. IEICE Transactions on Information and Systems, 2011.
+[2] A. Shashua and A. Levin, "Ranking with large margin principle: Two approaches" in Advances in Neural Information Processing Systems 15, ed. S.T. S. Becker and K. Ober- mayer, MIT Press.
+[3] Christopher J.C. Burges, "From RankNet to LambdaRank to LambdaMART: An Overview", Microsoft Research Technical Report, 2010
  
