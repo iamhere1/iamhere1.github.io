@@ -96,7 +96,7 @@
 <meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/oc_svm.png">
 <meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/pairwise_listwise.png">
 <meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/lambadMART.png">
-<meta property="og:updated_time" content="2019-02-12T08:18:38.796Z">
+<meta property="og:updated_time" content="2019-02-12T08:29:29.684Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="learning to rank算法学习">
 <meta name="twitter:description" content="learning to rank算法笔记">
@@ -417,7 +417,7 @@
 <p>我们以LambdaRank方法为例，对Listwise进行说明。</p>
 <h2 id="LambdaRank"><a href="#LambdaRank" class="headerlink" title="LambdaRank"></a>LambdaRank</h2><p>LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型打分的梯度，而不是直接通过计算得到，是LambdaRank的主要思路。采用这样的思路，能绕过NDCG等排序指标对模型打分求导的困难。而$lambad$值正是代表对模型打分的梯度信息，每篇文档的$lambad$都从其它所有不同label的文档处获得其对应的更新方向和更新值。</p>
 <p>对式10进行更新，乘于交换文档对$d_i$和$d_j$在rank列表中的位置后NDCG的变化幅度，能得到不错的结果[3]。</p>
-<p>$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})|\triangle NDCG| (12)$</p>
+<p>$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})|\triangle NDCG|$</p>
 <p>由于每个query对应的文档对集合I中，前一个文档的相关性大于后一个，$S_{ij}=1$，因此，式12可以直接写成：<br>$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \frac{-\sigma |\triangle NDCG|}{1+e^{-\sigma(s_i-s_j)}}) (12)$</p>
 <p>经验表明，式12能直接优化NDCG指标。实际上，如果我们要优化其它指标，如MAP、MRR等，只需要更新NDCG的变化幅度为其它指标的变化幅度[3]。</p>
 <h2 id="LambdaMART"><a href="#LambdaMART" class="headerlink" title="LambdaMART"></a>LambdaMART</h2><p>LambdaMART算法是LambdaRank和MART算法的组合。MART算法提供了算法的框架，需要用到的梯度相关信息则来自LambdaRank方法的梯度$y_i’=\lambda_i = \sum_{j:(i,j) \in I}\lambda_{ij}-\sum_{j:(j,i) \in I}\lambda_{ij}$</p>
