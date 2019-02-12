@@ -94,7 +94,9 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/l2r_framework.png">
 <meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/oc_svm.png">
-<meta property="og:updated_time" content="2019-02-11T02:51:22.457Z">
+<meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/pairwise_listwise.png">
+<meta property="og:image" content="http://learning.github.com/2019/01/29/learning_to_rank/lambadMART.png">
+<meta property="og:updated_time" content="2019-02-12T08:18:38.796Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="learning to rank算法学习">
 <meta name="twitter:description" content="learning to rank算法笔记">
@@ -381,33 +383,55 @@
 
 
 
-<h1 id="Pairwise"><a href="#Pairwise" class="headerlink" title="Pairwise"></a>Pairwise</h1><p>基于pairwise的rank方法中，将排序问题转化为pairwise的分类或回归问题进行求解。通常情况下，针对一个query对应的document pair, 利用分类器对pair的order进行判断。常见的pairwise rank方法有rank net、rank svm等，此处以rank net为例进行说明。</p>
-<h2 id="rank-net原理及求解"><a href="#rank-net原理及求解" class="headerlink" title="rank net原理及求解"></a>rank net原理及求解</h2><p><strong>rank net建模</strong></p>
-<p>rank net使用的打分模型要求对参数可导，训练数据根据query分为多个组，对于1个给定的query，选择2个不同相关性label的document pair，计算相关性分数$s_i=f(x_i)$和$s_j=f(x_j)$，rank net对其对应的特征向量进行打分。$d_i&gt;d_j$表示document $d_i$的相关性大于$d_j$。</p>
+<h1 id="Pairwise"><a href="#Pairwise" class="headerlink" title="Pairwise"></a>Pairwise</h1><p>基于pairwise的rank方法中，将排序问题转化为pairwise的分类或回归问题进行求解。通常情况下，针对一个query对应的document pair, 利用分类器对pair的order进行判断。常见的pairwise rank方法有RankNet、RankSvm等，此处以RankNet为例进行说明。</p>
+<h2 id="RankNet原理及求解"><a href="#RankNet原理及求解" class="headerlink" title="RankNet原理及求解"></a>RankNet原理及求解</h2><p><strong>RankNet建模</strong></p>
+<p>RankNet使用的打分模型要求对参数可导，训练数据根据query分为多个组，对于1个给定的query，选择2个不同相关性label的document pair，计算相关性分数$s_i=f(x_i)$和$s_j=f(x_j)$，RankNet对其对应的特征向量进行打分。$d_i&gt;d_j$表示document $d_i$的相关性大于$d_j$。</p>
 <p>document $d_i$的相关性大于document $d_j$的概率如下:</p>
 <p>$P_{ij}=P(d_i&gt;d_j)=\frac{1}{1+e^{-\sigma (s_i-s_j)}}  (1)$ </p>
-<p>其中$\sigma$是常数，决定sigmoid函数的形状。rank net采用交叉熵函数训练模型，如下所示。其中$P’_{ij}$表示真实的$d_i$相关性大于$d_j$的概率。</p>
-<p>$C=-P’_{ij}logP_{ij}-(1-P’_{ij})log(1-P_{ij}))  (2)$</p>
-<p><strong>rank net求解</strong></p>
+<p>其中$\sigma$是常数，决定sigmoid函数的形状。RankNet采用交叉熵函数训练模型，如下所示。其中$P’_{ij}$表示真实的$d_i$相关性大于$d_j$的概率。</p>
+<p>$C=-P’_{ij}logP_{ij}-(1-P’_{ij})log(1-P_{ij})  (2)$</p>
+<p><strong>RankNet求解</strong></p>
 <p>为方便后续描述，针对1个给定的query，我们定义变量$S_{ij}$：</p>
 <p>$S_{ij} =<br>\begin{cases}<br>1,  &amp; d_i比d_j更相关\\<br>-1,  &amp; d_j比d_i更相关\\<br>0  &amp; d_i和d_j相关性相同<br>\end{cases}<br> (3)$</p>
 <p>在本文中，假定对于每个query，其对应所有document的相关性顺序都是完全确定的。</p>
 <p>因此，</p>
 <p>$P’_{ij}=\frac{1}{2}(1+S_{ij}). (4)$</p>
-<p>由上述式2和式4的到，$C=\frac{1}{2}(1-S_{ij})\sigma (s_i - s_j) + log(1+e^{-\sigma(s_i-s_j)}) (5)$</p>
+<p>由上述式2和式4可以得出：</p>
+<p>$C=-P’_{ij}logP_{ij}-(1-P’_{ij})log(1-P_{ij}) \\<br>  = -\frac{1}{2}(1+S_{ij})logP_{ij}-(1-\frac{1}{2}(1+S_{ij}))log(1-P_{ij}) \\<br>  = -\frac{1}{2}(logP_{ij}+log(1-P_{ij}))-\frac{1}{2}S_{ij}(logP_{ij}-log(1-P_{ij}) \\<br>  = -\frac{1}{2}log(P_{ij}*(1-P_{ij}))-\frac{1}{2}S_{ij}log\frac{P_{ij}}{1-P_{ij}} \\<br>  = -\frac{1}{2}log\frac{e^{-\sigma(s_i-s_j)}}{(1+e^{-\sigma(s_i-s_j)})^2} -\frac{1}{2}S_{ij}loge^{\sigma(s_i-s_j)} \\<br>  = -\frac{1}{2}(-\sigma(s_i-s_j)-2log(1+e^{-\sigma(s_i-s_j)})) -\frac{1}{2}S_{ij}\sigma(s_i-s_j) \\<br>  = \frac{1}{2}(1-S_{ij})\sigma(s_i-s_j)+log(1+e^{-\sigma(s_i-s_j})<br>(5)$</p>
 <p>$C =<br>\begin{cases}<br>log(1+e^{-\sigma(s_i-s_j)}),  &amp; 当S_{ij}=1\\<br>log(1+e^{-\sigma(s_j-s_i)}),  &amp; 当S_{ij}=-1<br>\end{cases}<br>(6)$</p>
 <p>$C$对$s$求导，结果如下：<br>$ \frac{\varphi C}{\varphi s_i}=\sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})=-\frac{\varphi C}{\varphi s_j} (7)$</p>
 <p>通过SGD的方式进行求解</p>
 <p>$w_k=w_k-\eta (\frac{\varphi C}{\varphi s_i}\frac{\varphi s_i}{\varphi w_k}+\frac{\varphi C}{\varphi s_j}\frac{\varphi s_j}{\varphi w_k}) (8)$</p>
 <p>其中$\eta &gt; 0$为学习率。</p>
-<p><strong>rank net求解加速</strong></p>
+<p><strong>RankNet求解加速</strong></p>
 <p>对于给定的文档对$d_i$和$d_j$，</p>
 <p>$ \frac{\varphi C}{\varphi w_k}=\frac{\varphi C}{\varphi s_i}\frac{\varphi s_i}{w_k}+\frac{\varphi C}{\varphi s_j}\frac{\varphi s_j}{\varphi w_k} = \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}}) (\frac{\varphi s_i}{\varphi w_k} - \frac{\varphi s_j}{\varphi w_k})=\lambda_{ij}(\frac{\varphi s_i}{\varphi w_k} - \frac{\varphi s_j}{\varphi w_k})(9)$</p>
-<p>其中$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})$</p>
+<p>其中$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})（10）$</p>
 <p>我们定义$I$为索引对$(i,j)$的集合(其中$doc_i$的相关性大于$doc_j$)，汇总来自所有文档对的贡献，</p>
-<p>$\delta w_k=-\eta \sum_{(i,j) \in I} \lambda_{ij}(\frac{\varphi s_i}{\varphi w_k} - \frac{\varphi s_j}{\varphi w_k})=-\eta\sum_i\lambda_i\frac{\varphi s_i}{\varphi w_k}(10)$</p>
-<p>其中$\lambda_i = \sum_{j:(i,j) \in I}\lambda_{ij}-\sum_{j:(j,i) \in I}\lambda_{ij}$，每个document对应一个$\lambda_i$，方向表示梯度更新的方向，大小表示梯度更新的幅度。每个$\lambda_i$的计算都来自该document对应的所有pair。在实际计算时，可以对每个文档计算其对应的$\lambda_i$，然后用于更新模型参数。这种mini-batch的梯度更新方式和问题分解方法，显著提升了ranknet学习的效率。</p>
-<h1 id="Listwise"><a href="#Listwise" class="headerlink" title="Listwise"></a>Listwise</h1><h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1] A Short Introduction to Learning to Rank<br>[2] A. Shashua and A. Levin, “Ranking with large margin prin- ciple: Two approaches,” in Advances in Neural Information Processing Systems 15, ed. S.T. S. Becker and K. Ober- mayer, MIT Press.</p>
+<p>$\delta w_k=-\eta \sum_{(i,j) \in I} \lambda_{ij}(\frac{\varphi s_i}{\varphi w_k} - \frac{\varphi s_j}{\varphi w_k})=-\eta\sum_i\lambda_i\frac{\varphi s_i}{\varphi w_k}(11)$</p>
+<p>其中$\lambda_i = \sum_{j:(i,j) \in I}\lambda_{ij}-\sum_{j:(j,i) \in I}\lambda_{ij}$，每个document对应一个$\lambda_i$，其含义为损失函数对文档$d_i$的模型打分$s_i$的梯度。方向表示梯度的方向，大小表示梯度的幅度。每个$\lambda_i$的计算都来自该document对应的所有pair。在实际计算时，可以对每个文档计算其对应的$\lambda_i$，然后用于更新模型参数。这种mini-batch的梯度更新方式和问题分解方法，显著提升了RankNet模型训练的效率。</p>
+<h1 id="Listwise"><a href="#Listwise" class="headerlink" title="Listwise"></a>Listwise</h1><p>基于pairwise的方法(如RankNet)优化的是pairwise误差，而在很多rank相关领域如信息检索，更加关注的是topK的排序结果。</p>
+<p>如下图所示，假定当前文档的相关性值只有0和1，灰色线表示和当前query不相关的文档，蓝色线表示和当前query相关文档，对于左图，pairwise误差为13，对于右图，将上面的相关文档下移3个位置，下面的相关文档上移5个位置，pairwise误差减少到11，而对于NDCG等更加关注top k结果的排序指标，误差可能是增加的。右图中的黑色箭头表示RankNet梯度方向，而我们更想要的是红色箭头对应的梯度方向。此时，就需要利用ListRank方法解决。</p>
+<center><br><img src="/2019/01/29/learning_to_rank/pairwise_listwise.png" alt="“pairwise and listwise”"><br></center><br><center>图3：pairwise和listwise误差比较[3]</center>
+
+<p>我们以LambdaRank方法为例，对Listwise进行说明。</p>
+<h2 id="LambdaRank"><a href="#LambdaRank" class="headerlink" title="LambdaRank"></a>LambdaRank</h2><p>LambdaRank的建模和求解与RankNet类似。通过直接写出Cost对模型打分的梯度，而不是直接通过计算得到，是LambdaRank的主要思路。采用这样的思路，能绕过NDCG等排序指标对模型打分求导的困难。而$lambad$值正是代表对模型打分的梯度信息，每篇文档的$lambad$都从其它所有不同label的文档处获得其对应的更新方向和更新值。</p>
+<p>对式10进行更新，乘于交换文档对$d_i$和$d_j$在rank列表中的位置后NDCG的变化幅度，能得到不错的结果[3]。</p>
+<p>$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \sigma (\frac{1}{2}(1-S_{ij})-\frac{1}{1+e^{-\sigma(s_i-s_j)}})|\triangle NDCG| (12)$</p>
+<p>由于每个query对应的文档对集合I中，前一个文档的相关性大于后一个，$S_{ij}=1$，因此，式12可以直接写成：<br>$\lambda_{ij}=\frac{\varphi C}{\varphi s_i}= \frac{-\sigma |\triangle NDCG|}{1+e^{-\sigma(s_i-s_j)}}) (12)$</p>
+<p>经验表明，式12能直接优化NDCG指标。实际上，如果我们要优化其它指标，如MAP、MRR等，只需要更新NDCG的变化幅度为其它指标的变化幅度[3]。</p>
+<h2 id="LambdaMART"><a href="#LambdaMART" class="headerlink" title="LambdaMART"></a>LambdaMART</h2><p>LambdaMART算法是LambdaRank和MART算法的组合。MART算法提供了算法的框架，需要用到的梯度相关信息则来自LambdaRank方法的梯度$y_i’=\lambda_i = \sum_{j:(i,j) \in I}\lambda_{ij}-\sum_{j:(j,i) \in I}\lambda_{ij}$</p>
+<p>为方便描述，我们引入<br>$\sum_{(i,j) \doteq I} \lambda_{ij} = \sum_{j:(i,j) \in I}\lambda_{ij}-\sum_{j:(j,i) \in I}\lambda_{ij}$</p>
+<p>$\lambda_i$相当于如下函数的导数：<br>$C=\sum_{(i,j) \doteq I}|\triangle NDCG_{ij}|log(1+e^{-\sigma(s_i-s_j)})$</p>
+<p>$\frac{\varphi C}{\varphi s_i}= \sum_{(i,j) \doteq I}\frac{-\sigma |\triangle NDCG_{ij}|}{1+e^{-\sigma(s_i-s_j)}})= \sum_{(i,j) \doteq I} -\sigma |\triangle NDCG_{ij}|\rho_{ij}(13)$<br>其中$\rho_{ij}=\frac{1}{1+e^{-\sigma(s_i-s_j)}}$</p>
+<p>$\frac{\varphi^2 C}{\varphi s_i^2}= \sum_{(i,j) \doteq I}\sigma^2 |\triangle NDCG_{ij}|\rho_{ij}(1-\rho_{ij})(14)$</p>
+<p>对于第m棵树的第k个叶子结点，其对应的值如下：<br>$\gamma_{km}=\frac{\sum_{x_i \in R_{km}} \frac{\varphi C}{\varphi s_i}}{\sum_{x_i \in R_{km}} \frac{\varphi^2 C}{\varphi s_i^2}}=\frac{-\sum_{x_i \in R_{km}}\sum_{(i,j)\doteq I}|\triangle NDCG_{ij}|\rho_{ij}}{\sum_{x_i \in R_{km}}\sum_{(i,j)\doteq I}|\triangle NDCG_{ij}|\sigma\rho_{ij}(1-\rho_{ij})}$</p>
+<p>LambdaMART算法的流程如下：</p>
+<center><br><img src="/2019/01/29/learning_to_rank/lambadMART.png" alt="“lambadMART”"><br></center><br><center>图4:lambadMART算法流程[3]</center>
+
+<p><strong>lambdaRank和lambadMART参数更新的不同：</strong></p>
+<p>前者对于每个query，计算梯度信息并更新一次参数，每次更新所有的模型参数；后者对每次分裂使用所有落在当前节点的样本及在同一group的样本，只更新当前节点的参数而非所有模型参数。</p>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><p>[1] LI, Hang. “A Short Introduction to Learning to Rank”[J]. IEICE Transactions on Information and Systems, 2011.<br>[2] A. Shashua and A. Levin, “Ranking with large margin principle: Two approaches” in Advances in Neural Information Processing Systems 15, ed. S.T. S. Becker and K. Ober- mayer, MIT Press.<br>[3] Christopher J.C. Burges, “From RankNet to LambdaRank to LambdaMART: An Overview”, Microsoft Research Technical Report, 2010</p>
 
       
     </div>
@@ -560,7 +584,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#L2R建模"><span class="nav-number">1.</span> <span class="nav-text">L2R建模</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L2R评估"><span class="nav-number">2.</span> <span class="nav-text">L2R评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DCG"><span class="nav-number">2.1.</span> <span class="nav-text">DCG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NDCG"><span class="nav-number">2.2.</span> <span class="nav-text">NDCG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MAP"><span class="nav-number">2.3.</span> <span class="nav-text">MAP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pointwise"><span class="nav-number">3.</span> <span class="nav-text">Pointwise</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pairwise"><span class="nav-number">4.</span> <span class="nav-text">Pairwise</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#rank-net原理及求解"><span class="nav-number">4.1.</span> <span class="nav-text">rank net原理及求解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Listwise"><span class="nav-number">5.</span> <span class="nav-text">Listwise</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#L2R建模"><span class="nav-number">1.</span> <span class="nav-text">L2R建模</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#L2R评估"><span class="nav-number">2.</span> <span class="nav-text">L2R评估</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DCG"><span class="nav-number">2.1.</span> <span class="nav-text">DCG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NDCG"><span class="nav-number">2.2.</span> <span class="nav-text">NDCG</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MAP"><span class="nav-number">2.3.</span> <span class="nav-text">MAP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pointwise"><span class="nav-number">3.</span> <span class="nav-text">Pointwise</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pairwise"><span class="nav-number">4.</span> <span class="nav-text">Pairwise</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RankNet原理及求解"><span class="nav-number">4.1.</span> <span class="nav-text">RankNet原理及求解</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Listwise"><span class="nav-number">5.</span> <span class="nav-text">Listwise</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LambdaRank"><span class="nav-number">5.1.</span> <span class="nav-text">LambdaRank</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LambdaMART"><span class="nav-number">5.2.</span> <span class="nav-text">LambdaMART</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
             
           </div>
         </section>
